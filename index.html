@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Supplier Tracker</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\ud83d\udce6</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -33,10 +33,10 @@
     background: var(--surface2); color: var(--text); font-size: 14px; outline: none;
   }
   .search-wrap input:focus { border-color: var(--accent); }
-  .search-wrap::before {
-    content: '\ud83d\udd0d'; position: absolute; left: 12px; top: 50%;
-    transform: translateY(-50%); font-size: 14px; opacity: .5;
-  }
+  .search-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); font-size: 14px; opacity: .5; pointer-events: none;
+    }
   .status-filters { display: flex; gap: 6px; flex-wrap: wrap; }
   .status-filters button {
     padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px;
@@ -175,8 +175,9 @@
 
 <div class="controls">
   <div class="search-wrap">
-    <input type="text" id="search" placeholder="Search suppliers..." oninput="render()" />
-  </div>
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" id="search" placeholder="Search suppliers..." oninput="render()" />
+    </div>
   <div class="status-filters" id="statusFilters"></div>
 </div>
 
