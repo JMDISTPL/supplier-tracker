@@ -413,209 +413,116 @@
 
 <!-- FLOW PAGE -->
 <div id="page-flow" class="page" style="padding:0;overflow:hidden">
-  <div style="flex:1;overflow-y:auto;padding:24px 32px" id="flowContainer">
-    <div style="max-width:900px;margin:0 auto">
-      <h2 style="font-size:20px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px">🗺️ Private Label Flow</h2>
-      <p style="color:var(--text2);font-size:13px;margin-bottom:24px">End-to-end Amazon Private Label workflow</p>
-    </div>
+  <div style="flex:1;overflow-x:auto;overflow-y:hidden;padding:16px 20px" id="flowContainer">
+    <div style="display:flex;align-items:flex-start;gap:0;min-height:calc(100vh - 100px);white-space:nowrap" id="flowRow"></div>
   </div>
 </div>
 
 <style>
-  /* Flowchart styles */
-  .flow-node {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px 20px; margin-bottom: 0; position: relative;
-    transition: border-color .2s, box-shadow .2s; max-width: 520px;
+  .f-node {
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:6px 10px; cursor:default; transition:border-color .15s; white-space:nowrap;
+    font-size:12px; font-weight:500; line-height:1.2; flex-shrink:0;
   }
-  .flow-node:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .flow-node .node-icon { font-size: 20px; margin-right: 10px; }
-  .flow-node .node-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
-  .flow-node .node-meta { font-size: 12px; color: var(--text2); margin-top: 4px; }
-  .flow-center { display: flex; flex-direction: column; align-items: center; }
-  .flow-line { width: 2px; height: 32px; background: var(--border); flex-shrink: 0; }
-  .flow-arrow { color: var(--text2); font-size: 14px; margin: -2px 0; }
+  .f-node:hover { border-color:var(--accent); }
+  .f-node .fi { font-size:14px; }
+  .f-node.start { border-color:var(--accent); }
+  .f-node.decision { border-color:var(--orange); }
+  .f-node.success { border-color:var(--green); }
+  .f-node.warn { border-color:var(--red); }
 
-  /* Branch container - horizontal split */
-  .flow-branch-row {
-    display: flex; gap: 24px; justify-content: center; width: 100%;
-    position: relative; padding: 8px 0;
-  }
-  .flow-branch-row::before {
-    content: ''; position: absolute; top: -16px; left: 50%;
-    width: 2px; height: 24px; background: var(--border);
-    transform: translateX(-50%);
-  }
-  .flow-branch-row::after {
-    content: ''; position: absolute; top: -16px; left: 10%; right: 10%;
-    height: 2px; background: var(--border);
-  }
-  .flow-branch-col {
-    flex: 1; max-width: 380px; display: flex; flex-direction: column; align-items: center;
-  }
-  .flow-branch-col .branch-label {
-    font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
-    color: var(--text2); margin-bottom: 8px; font-weight: 600;
-  }
-  .flow-branch-col .flow-line { height: 20px; }
+  .f-col { display:inline-flex; flex-direction:column; align-items:center; flex-shrink:0; }
+  .f-row { display:inline-flex; align-items:center; gap:0; }
+  .f-arr { color:var(--text2); font-size:12px; margin:0 -2px; flex-shrink:0; }
+  .f-line { width:20px; height:2px; background:var(--border); flex-shrink:0; }
+  .f-vline { width:2px; height:14px; background:var(--border); flex-shrink:0; }
 
-  /* Loop back arrow */
-  .flow-loop {
-    display: flex; align-items: center; gap: 8px; font-size: 12px;
-    color: var(--orange); margin: 4px 0; cursor: default;
+  .f-branch {
+    display:inline-flex; flex-direction:column; align-items:center;
+    position:relative; padding:0 4px;
   }
-  .flow-loop .loop-arrow { font-size: 16px; }
-
-  /* Node accent colors */
-  .flow-node.start { border-color: var(--accent); }
-  .flow-node.decision { border-color: var(--orange); }
-  .flow-node.success { border-color: var(--green); }
-
-  /* Sub-label in branch */
-  .branch-context { font-size: 11px; color: var(--text2); margin-top: 3px; font-style: italic; }
+  .f-branch::before {
+    content:''; position:absolute; top:50%; left:0; right:0;
+    height:2px; background:var(--border);
+  }
+  .f-branch-top, .f-branch-bot {
+    display:flex; align-items:center; gap:4px; padding:4px 0; position:relative;
+  }
+  .f-branch-top::after {
+    content:''; position:absolute; bottom:-4px; left:50%;
+    width:2px; height:4px; background:var(--border);
+  }
+  .f-branch-bot::before {
+    content:''; position:absolute; top:-4px; left:50%;
+    width:2px; height:4px; background:var(--border);
+  }
+  .f-bl { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.3px; margin:0 4px; }
+  .f-loop { font-size:10px; color:var(--orange); display:inline-flex; align-items:center; gap:3px; }
 </style>
 
 <script>
-  (function() {
-    var container = document.getElementById('flowContainer');
-    if (!container) return;
-    var inner = container.querySelector('div');
-    if (!inner) return;
+(function(){
+  var row = document.getElementById('flowRow');
+  if (!row) return;
 
-    function node(icon, title, meta, cls) {
-      return '<div class="flow-node ' + (cls||'') + '"><div style="display:flex;align-items:flex-start;gap:2px"><span class="node-icon">' + icon + '</span><div><div class="node-title">' + title + '</div>' + (meta ? '<div class="node-meta">' + meta + '</div>' : '') + '</div></div></div>';
-    }
-    function line() { return '<div class="flow-line"></div>'; }
-    function arrow() { return '<div class="flow-arrow">▼</div>'; }
-    function branchRow(leftHtml, rightHtml, leftLabel, rightLabel) {
-      return '<div class="flow-branch-row">' +
-        '<div class="flow-branch-col"><div class="branch-label">' + leftLabel + '</div>' + leftHtml + '</div>' +
-        '<div class="flow-branch-col"><div class="branch-label">' + rightLabel + '</div>' + rightHtml + '</div>' +
-      '</div>';
-    }
+  function n(icon, text, cls) {
+    return '<span class="f-node ' + (cls||'') + '"><span class="fi">' + icon + '</span>' + text + '</span>';
+  }
+  function arr() { return '<span class="f-arr">▸</span>'; }
+  function line() { return '<span class="f-line"></span>'; }
+  function col() { return '<span class="f-col">'; }
+  function _col() { return '</span>'; }
 
-    var html = '';
-    html += '<div class="flow-center">';
+  function branch(topHtml, botHtml, topLabel, botLabel) {
+    return '<span class="f-branch"><span class="f-branch-top">' + (topLabel ? '<span class="f-bl">' + topLabel + '</span>' : '') + topHtml + '</span><span class="f-branch-bot">' + (botLabel ? '<span class="f-bl">' + botLabel + '</span>' : '') + botHtml + '</span></span>';
+  }
 
-    // Step 1
-    html += node('📋', 'Acquire Alibaba / Helium 10 / JungleScout / Sellerboard Accounts', 'Set up tools for product research and sourcing', 'start');
-    html += arrow() + line();
+  var h = '';
+  h += col();
+  h += n('📋', 'Get Tools', 'start') + arr() + line();
+  h += n('🔍', 'Find Product') + arr() + line();
+  h += n('🏢', 'LLC') + arr() + line();
+  h += n('🛒', 'Seller Account') + arr() + line();
+  h += n('🏦', 'Bank Accounts') + arr() + line();
+  h += n('🔍', 'Find Product') + arr() + line();
+  h += n('📞', 'Contact 5-10');
+  h += arr() + line();
+  h += branch(
+    n('❌', 'Bad Samples', 'warn') + arr() + '<span class="f-loop">↩ Contact</span>',
+    n('✅', 'Good Samples', 'success'),
+    'FAIL', 'PASS'
+  );
+  h += arr() + line();
+  h += n('📦', 'Order 3 Samples') + arr() + line();
+  h += n('🏆', 'Best Seller') + arr() + line();
+  h += n('⚖️', 'Best Supplier') + arr() + line();
+  h += n('✏️', 'Negotiate') + arr() + line();
+  h += n('📊', 'Barcodes') + arr() + line();
+  h += n('📄', 'Dummy Listing') + arr() + line();
+  h += n('💰', '30-50% Deposit') + arr() + line();
+  h += n('🔎', 'Inspection', 'decision');
+  h += arr() + line();
+  h += branch(
+    n('⚠️', 'Issues?', 'warn') + arr() + '<span class="f-loop">↩ Contact</span>',
+    n('✅', 'Passed', 'success'),
+    'FAIL', 'PASS'
+  );
+  h += arr() + line();
+  // Double branch
+  h += '<span class="f-branch"><span class="f-branch-top">' +
+    n('📷', 'Listing Team') + arr() + line() + n('🔄', 'Revise Listing') +
+  '</span><span class="f-branch-bot">' +
+    n('🚚', 'Shipping+FNSKU') +
+  '</span></span>';
+  h += arr() + line();
+  h += n('⭐', 'FNF Reviews') + arr() + line();
+  h += n('®️', 'Brand Registry') + arr() + line();
+  h += n('🌿', 'Amazon Vine', 'success');
+  h += _col();
 
-    // Step 2
-    html += node('🔍', 'Find Winning Product', 'Market research, keyword analysis, competition check');
-    html += arrow() + line();
-
-    // Step 3
-    html += node('🏢', 'Setup LLC', 'Legal entity for your Amazon business');
-    html += arrow() + line();
-
-    // Step 4
-    html += node('🛒', 'Create Seller Account with LLC', 'Register Amazon seller account under your LLC');
-    html += arrow() + line();
-
-    // Step 5
-    html += node('🏦', 'Setup Business Bank Accounts', 'Separate business banking for clean accounting');
-    html += arrow() + line();
-
-    // Step 6
-    html += node('🔍', 'Find Winning Product', 'Validate product-market fit, margins, and demand');
-    html += arrow() + line();
-
-    // Step 7 - Contact suppliers with branch
-    html += node('📞', 'Contact 5–10 Suppliers', 'Reach out via Alibaba, evaluate responses');
-    html += arrow() + line();
-
-    // Branch 1: sampling
-    html += branchRow(
-      '<div class="flow-center">' + line() + arrow() +
-        node('❌', 'Samples Bad', 'Review feedback, revise requirements', 'decision') +
-        '<div class="flow-loop"><span class="loop-arrow">↩</span>Back to Contact Suppliers</div>' +
-      '</div>',
-      '<div class="flow-center">' + line() + arrow() +
-        node('✅', 'Samples Good', 'Proceed with selected supplier', 'success') +
-      '</div>',
-      'SAMPLES FAIL', 'SAMPLES PASS'
-    );
-
-    html += arrow() + line();
-
-    // Step 8
-    html += node('📦', 'Order Samples from 3 Manufacturers', 'Compare quality, pricing, and lead times');
-    html += arrow() + line();
-
-    // Step 9
-    html += node('🏆', 'Order Sample from Best Seller', 'Final sample from top-performing supplier');
-    html += arrow() + line();
-
-    // Step 10
-    html += node('⚖️', 'Find Best Fit Supplier', 'Evaluate based on quality vs. price');
-    html += arrow() + line();
-
-    // Step 11
-    html += node('✏️', 'Negotiate Product Changes & Custom Packaging', 'Finalize product specs and branding');
-    html += arrow() + line();
-
-    // Step 12
-    html += node('📊', 'Register Barcodes', 'UPC/EAN codes for Amazon listing');
-    html += arrow() + line();
-
-    // Step 13
-    html += node('📄', 'Create Dummy Listing While Waiting', 'Draft listing, prep keywords and images');
-    html += arrow() + line();
-
-    // Step 14
-    html += node('💰', '30–50% Deposit Pre-Manufacture', 'Secure production slot with supplier');
-    html += arrow() + line();
-
-    // Step 15 - Inspection with double branch
-    html += node('🔎', 'Schedule Product Inspection', 'Third-party quality inspection (QIMA)', 'decision');
-    html += arrow() + line();
-
-    // Major issues branch
-    html += branchRow(
-      '<div class="flow-center">' + line() + arrow() +
-        node('⚠️', 'Major Issues?', 'Quality failures, spec not met', 'decision') +
-        '<div class="flow-loop"><span class="loop-arrow">↩</span>Back to Contact Suppliers</div>' +
-      '</div>',
-      '<div class="flow-center">' + line() + arrow() +
-        node('✅', 'No Major Issues', 'Inspection passed', 'success') +
-      '</div>',
-      'FAILED INSPECTION', 'PASSED INSPECTION'
-    );
-
-    html += arrow() + line();
-
-    // Double branch after inspection
-    html += '<div class="flow-branch-row">' +
-      '<div class="flow-branch-col"><div class="branch-label">📸 LISTING PREP</div>' +
-        '<div class="flow-center">' + line() + arrow() +
-          node('📷', 'Send to Listing Team', 'Product photos & listing creation') + line() + arrow() +
-          node('🔄', 'Revise Listing While Waiting', '2+ weeks until product arrives') +
-        '</div>' +
-      '</div>' +
-      '<div class="flow-branch-col"><div class="branch-label">📦 SHIPPING</div>' +
-        '<div class="flow-center">' + line() + arrow() +
-          node('🚚', 'Set Up Shipping Plan & Get FNSKUs', 'Manufacturer ships to Amazon') +
-        '</div>' +
-      '</div>' +
-    '</div>';
-
-    html += arrow() + line();
-
-    // Step 16
-    html += node('⭐', 'Get Reviews from FNF', 'Friends & Family early reviews');
-    html += arrow() + line();
-
-    // Step 17
-    html += node('®️', 'Trademark Brand & Submit for Brand Registry', 'Protect your brand on Amazon');
-    html += arrow() + line();
-
-    // Step 18
-    html += node('🌿', 'Enroll in Amazon Vine', 'Get verified reviews from Amazon\'s review program', 'success');
-
-    html += '</div>';
-    inner.innerHTML += '<div style="max-width:900px;margin:0 auto;padding-bottom:40px">' + html + '</div>';
-  })();
+  row.innerHTML = h;
+})();
 </script>
 
 </div>
