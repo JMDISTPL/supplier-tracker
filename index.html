@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Supplier Tracker</title>
+<title>JMPL Logistics</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,41 +15,46 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* Header */
   header {
     background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 16px 24px; display: flex; align-items: center;
+    padding: 14px 24px; display: flex; align-items: center;
     justify-content: space-between; flex-wrap: wrap; gap: 12px;
   }
-  header h1 { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-  header .subtitle { font-size: 13px; color: var(--text2); }
+  header .brand h1 { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  header .brand .subtitle { font-size: 12px; color: var(--text2); }
+
+  /* Navigation tabs */
+  .nav-tabs {
+    display: flex; gap: 4px; background: var(--surface2);
+    padding: 4px; border-radius: 8px;
+  }
+  .nav-tabs a {
+    padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    color: var(--text2); text-decoration: none; cursor: pointer; transition: all .15s;
+  }
+  .nav-tabs a:hover { color: var(--text); }
+  .nav-tabs a.active { background: var(--accent); color: white; }
+
+  /* Pages */
+  .page { display: none; }
+  .page.active { display: flex; flex-direction: column; flex: 1; }
+
+  /* ============ SUPPLIER PAGE ============ */
   .controls {
     display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
     padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
   }
   .search-wrap { flex: 1; min-width: 200px; position: relative; display: flex; align-items: center; }
-  .search-icon {
-    position: absolute; left: 12px; font-size: 14px; opacity: .5; pointer-events: none;
-  }
+  .search-icon { position: absolute; left: 12px; font-size: 14px; opacity: .5; pointer-events: none; }
   .search-wrap input {
     width: 100%; padding: 9px 14px 9px 36px;
     border: 1px solid var(--border); border-radius: 8px;
     background: var(--surface2); color: var(--text); font-size: 14px; outline: none;
   }
   .search-wrap input:focus { border-color: var(--accent); }
-  .btn-primary {
-    padding: 9px 18px; background: var(--accent); color: white; border: none;
-    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
-    white-space: nowrap;
-  }
-  .btn-primary:hover { background: var(--accent-hover); }
-  .btn-sm {
-    padding: 4px 10px; font-size: 12px; border-radius: 6px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text2); cursor: pointer;
-  }
-  .btn-sm:hover { color: var(--text); border-color: var(--text2); }
 
-  /* Stats */
   .stats { display: flex; gap: 10px; padding: 16px 24px; flex-wrap: wrap; }
   .stat-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -67,79 +72,109 @@
   .stat-card.sampling .num { color: var(--accent); }
   .stat-card.partners .num { color: var(--green); }
 
-  /* Kanban Board */
-  .board {
-    display: flex; gap: 12px; padding: 0 24px 24px;
-    flex: 1; overflow-x: auto; min-height: 0;
-  }
-  .column {
-    flex: 1; min-width: 220px; max-width: 300px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); display: flex; flex-direction: column;
-    max-height: calc(100vh - 200px);
-  }
+  .board { display: flex; gap: 12px; padding: 0 24px 24px; flex: 1; overflow-x: auto; }
+  .column { flex: 1; min-width: 200px; max-width: 280px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    display: flex; flex-direction: column; max-height: calc(100vh - 210px); }
   .column-header {
-    padding: 12px 14px; font-size: 13px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: .5px;
-    border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-    flex-shrink: 0;
+    padding: 10px 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
   }
-  .column-header .count {
-    background: var(--surface2); padding: 2px 8px;
-    border-radius: 10px; font-size: 12px; font-weight: 500;
-  }
-  .column-body {
-    padding: 8px; overflow-y: auto; flex: 1;
-    min-height: 60px;
-    transition: background .15s;
-  }
-  .column-body.drag-over {
-    background: var(--surface2);
-  }
+  .column-header .count { background: var(--surface2); padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+  .column-body { padding: 6px; overflow-y: auto; flex: 1; min-height: 50px; transition: background .15s; }
+  .column-body.drag-over { background: var(--surface2); }
   .column.prospects .column-header { color: var(--yellow); }
   .column.contacted .column-header { color: var(--blue); }
   .column.negotiating .column-header { color: var(--orange); }
   .column.sampling .column-header { color: var(--accent); }
   .column.partners .column-header { color: var(--green); }
 
-  /* Cards */
   .card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; margin-bottom: 6px;
-    cursor: grab; transition: all .15s; position: relative;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 10px; margin-bottom: 5px; cursor: grab; transition: all .15s; position: relative;
   }
   .card:active { cursor: grabbing; }
   .card:hover { border-color: var(--text2); }
-  .card.dragging {
-    opacity: .5; transform: rotate(2deg);
-  }
-  .card .card-company {
-    font-weight: 600; font-size: 13px; margin-bottom: 4px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .card .card-notes {
-    font-size: 11px; color: var(--text2);
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden; line-height: 1.4;
-  }
-  .card .card-link {
-    display: inline-block; font-size: 11px; color: var(--accent);
-    text-decoration: none; margin-top: 4px;
-  }
+  .card.dragging { opacity: .5; transform: rotate(2deg); }
+  .card .card-company { font-weight: 600; font-size: 12px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .card-notes { font-size: 11px; color: var(--text2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .card-link { font-size: 11px; color: var(--accent); text-decoration: none; }
   .card .card-link:hover { text-decoration: underline; }
-  .card .card-actions {
-    position: absolute; top: 6px; right: 6px; display: none; gap: 2px;
-  }
-  .card:hover .card-actions { display: flex; }
-  .card .card-actions button {
-    background: none; border: none; color: var(--text2); cursor: pointer;
-    font-size: 13px; padding: 2px 4px; border-radius: 4px;
-  }
-  .card .card-actions button:hover { background: var(--surface); color: var(--text); }
-  .card .card-actions .del-btn:hover { color: var(--red); }
+  .card .card-actions { position: absolute; top: 5px; right: 5px; display: none; }
+  .card:hover .card-actions { display: block; }
+  .card .card-actions button { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; }
+  .card .card-actions button:hover { background: var(--surface); color: var(--red); }
 
-  /* Modal */
+  /* ============ BRIEFS PAGE ============ */
+  .briefs-layout {
+    display: flex; flex: 1; gap: 0; overflow: hidden;
+  }
+  .briefs-sidebar {
+    width: 240px; flex-shrink: 0; background: var(--surface);
+    border-right: 1px solid var(--border); overflow-y: auto;
+    padding: 12px;
+  }
+  .briefs-sidebar h3 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .5px;
+    color: var(--text2); margin-bottom: 8px; padding: 0 4px;
+  }
+  .briefs-sidebar .brief-list-item {
+    padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    color: var(--text2); transition: all .1s; margin-bottom: 2px;
+  }
+  .briefs-sidebar .brief-list-item:hover { background: var(--surface2); color: var(--text); }
+  .briefs-sidebar .brief-list-item.active { background: var(--accent); color: white; }
+  .briefs-sidebar .brief-list-item .date-label { font-weight: 600; }
+  .briefs-sidebar .brief-list-item .title-preview { font-size: 11px; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .briefs-main {
+    flex: 1; overflow-y: auto; padding: 24px 32px;
+  }
+  .briefs-main .brief-date-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .briefs-main .brief-date-row input[type="date"] {
+    padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface2); color: var(--text); font-size: 14px; outline: none;
+  }
+  .briefs-main .brief-date-row input[type="date"]:focus { border-color: var(--accent); }
+
+  .briefs-main .section-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+    color: var(--text2); margin-bottom: 6px; font-weight: 600;
+  }
+  .briefs-main .brief-title-input {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface2); color: var(--text); font-size: 16px; font-weight: 600; outline: none;
+    margin-bottom: 16px;
+  }
+  .briefs-main .brief-title-input:focus { border-color: var(--accent); }
+  .briefs-main textarea {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface2); color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+    resize: vertical; min-height: 80px; margin-bottom: 16px;
+  }
+  .briefs-main textarea:focus { border-color: var(--accent); }
+  .briefs-main .section-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 16px;
+  }
+  .briefs-main .save-bar {
+    display: flex; gap: 10px; align-items: center; padding: 16px 0;
+    border-top: 1px solid var(--border); margin-top: 8px;
+  }
+  .save-status { font-size: 13px; color: var(--text2); margin-left: auto; }
+
+  .btn {
+    padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; background: var(--surface2); color: var(--text2); cursor: pointer; border: 1px solid var(--border); }
+  .btn-sm:hover { color: var(--text); border-color: var(--text2); }
+
+  /* Modal (shared) */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.6);
     display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
@@ -158,35 +193,34 @@
     width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
     background: var(--surface2); color: var(--text); font-size: 14px; outline: none; font-family: inherit;
   }
-  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group textarea { resize: vertical; min-height: 60px; }
   .form-row { display: flex; gap: 12px; }
   .form-row .form-group { flex: 1; }
   .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-  .form-actions .btn-secondary {
+  .btn-secondary {
     padding: 9px 18px; border: 1px solid var(--border); border-radius: 8px;
     background: transparent; color: var(--text2); cursor: pointer; font-size: 14px;
   }
-  .form-actions .btn-secondary:hover { color: var(--text); border-color: var(--text2); }
+  .btn-secondary:hover { color: var(--text); border-color: var(--text2); }
   .toast {
     position: fixed; bottom: 24px; right: 24px; background: var(--surface);
     border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px;
     font-size: 14px; color: var(--green); z-index: 200;
   }
   .loading { text-align: center; padding: 40px; color: var(--text2); }
-  .spinner {
-    display: inline-block; width: 32px; height: 32px;
+  .spinner { display: inline-block; width: 28px; height: 28px;
     border: 3px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 12px;
-  }
+    border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   @media (max-width: 900px) {
     .board { flex-direction: column; overflow-y: auto; }
     .column { max-width: none; min-width: 0; max-height: none; }
-    .column-body { max-height: 200px; }
-    header { padding: 12px 16px; }
-    .controls { padding: 12px 16px; }
-    .stats { padding: 12px 16px; gap: 6px; }
+    .column-body { max-height: 180px; }
+    .briefs-layout { flex-direction: column; }
+    .briefs-sidebar { width: 100%; max-height: 160px; border-right: none; border-bottom: 1px solid var(--border); }
+    .briefs-main { padding: 16px; }
+    .stats { gap: 6px; }
     .stat-card { padding: 8px 12px; min-width: auto; }
     .stat-card .num { font-size: 18px; }
   }
@@ -195,38 +229,59 @@
 <body>
 
 <header>
-  <div>
+  <div class="brand">
     <h1>📦 JMPL Logistics</h1>
-    <div class="subtitle">Drag &amp; drop to update status</div>
+    <div class="subtitle">Amazon PL operations dashboard</div>
   </div>
-  <button class="btn-primary" onclick="openAddModal()">+ Add Supplier</button>
+  <nav class="nav-tabs">
+    <a href="#suppliers" class="active" onclick="switchPage('suppliers')">📋 Suppliers</a>
+    <a href="#briefs" onclick="switchPage('briefs')">📝 Daily Briefs</a>
+  </nav>
 </header>
 
-<div class="controls">
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="search" placeholder="Filter suppliers..." oninput="render()" />
+<!-- ===== SUPPLIER PAGE ===== -->
+<div id="page-suppliers" class="page active">
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Filter suppliers..." oninput="renderSuppliers()" />
+    </div>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Add Supplier</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="board" id="board"></div>
+</div>
+
+<!-- ===== BRIEFS PAGE ===== -->
+<div id="page-briefs" class="page">
+  <div class="briefs-layout">
+    <div class="briefs-sidebar">
+      <h3>📅 Daily Briefs</h3>
+      <div id="briefList"></div>
+      <div style="padding:8px 4px;margin-top:4px;border-top:1px solid var(--border)">
+        <button class="btn btn-sm" onclick="newBrief()" style="width:100%">+ New Brief</button>
+      </div>
+    </div>
+    <div class="briefs-main">
+      <div id="briefEditor">
+        <div class="loading" style="padding:60px 0"><div class="spinner"></div><div>Loading briefs...</div></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="stats" id="stats"></div>
-
-<div class="board" id="board"></div>
-
-<!-- Add/Edit Modal -->
+<!-- Supplier Modal (shared) -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <button class="close-btn" onclick="closeModal()">&cross;</button>
     <h2 id="modalTitle">+ Add Supplier</h2>
     <input type="hidden" id="editId" />
     <div class="form-group">
-      <label>Company Name *</label>
-      <input type="text" id="fCompany" placeholder="e.g. Yiwu Lucky Star Crafts" />
+      <label>Company Name *</label><input type="text" id="fCompany" placeholder="e.g. Yiwu Lucky Star Crafts" />
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Storefront Link</label>
-        <input type="text" id="fStorefront" placeholder="Alibaba URL" />
+        <label>Storefront Link</label><input type="text" id="fStorefront" placeholder="Alibaba URL" />
       </div>
       <div class="form-group">
         <label>Status</label>
@@ -239,20 +294,12 @@
         </select>
       </div>
     </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="fEmail" placeholder="supplier@example.com" />
-    </div>
-    <div class="form-group">
-      <label>Notes</label>
-      <textarea id="fNotes" placeholder="Products, MOQ, pricing, business type, etc."></textarea>
-    </div>
-    <div class="form-group">
-      <label><input type="checkbox" id="fVerified" /> Verified Pro supplier</label>
-    </div>
+    <div class="form-group"><label>Email</label><input type="email" id="fEmail" placeholder="supplier@example.com" /></div>
+    <div class="form-group"><label>Notes</label><textarea id="fNotes" placeholder="Products, MOQ, pricing, business type, etc."></textarea></div>
+    <div class="form-group"><label><input type="checkbox" id="fVerified" /> Verified Pro supplier</label></div>
     <div class="form-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveSupplier()">Save</button>
+      <button class="btn btn-primary" onclick="saveSupplier()">Save</button>
     </div>
   </div>
 </div>
@@ -277,92 +324,57 @@ async function api(method, path, body) {
   const resp = await fetch(SUPABASE_URL + path, opts);
   if (!resp.ok) throw new Error((await resp.text()).substring(0, 100));
   const ct = resp.headers.get('content-type') || '';
-  if (ct.includes('json')) return resp.json();
-  return null;
+  return ct.includes('json') ? resp.json() : null;
 }
 
+// ===== PAGE ROUTING =====
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-tabs a').forEach(function(a) { a.classList.remove('active'); });
+  document.querySelector('.nav-tabs a[href="#' + name + '"]').classList.add('active');
+  window.location.hash = name;
+  if (name === 'briefs') loadBriefs();
+}
+
+var page = window.location.hash ? window.location.hash.substring(1) : 'suppliers';
+switchPage(page === 'briefs' ? 'briefs' : 'suppliers');
+
+// ============================================================
+// SUPPLIER MODULE
+// ============================================================
 const STATUSES = ['Prospects', 'Contacted', 'Negotiating', 'Sampling', 'Partners'];
 let suppliers = [];
 let filterStatus = null;
 let draggedId = null;
 
-// Drag & Drop
-function handleDragStart(e) {
-  draggedId = e.target.closest('.card').dataset.id;
-  e.target.closest('.card').classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-}
-function handleDragEnd(e) {
-  e.target.closest('.card').classList.remove('dragging');
-  document.querySelectorAll('.column-body').forEach(function(el) { el.classList.remove('drag-over'); });
-}
-function handleDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  e.currentTarget.classList.add('drag-over');
-}
-function handleDragLeave(e) {
-  e.currentTarget.classList.remove('drag-over');
-}
+function handleDragStart(e) { draggedId = e.target.closest('.card').dataset.id; e.target.closest('.card').classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+function handleDragEnd(e) { e.target.closest('.card').classList.remove('dragging'); document.querySelectorAll('.column-body').forEach(function(el) { el.classList.remove('drag-over'); }); }
+function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drag-over'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 async function handleDrop(e) {
-  e.preventDefault();
-  e.currentTarget.classList.remove('drag-over');
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
   var newStatus = e.currentTarget.dataset.status;
   if (!draggedId || !newStatus) return;
   var s = suppliers.find(function(s) { return s.id == draggedId; });
   if (!s || s.status === newStatus) return;
-  // Optimistic update
-  s.status = newStatus;
-  render();
-  try {
-    await api('PATCH', '/rest/v1/suppliers?id=eq.' + draggedId, { status: newStatus, updated_at: new Date().toISOString() });
-    toast('Moved to ' + newStatus);
-  } catch(e) {
-    toast('Error updating status', true);
-    load(); // reload to fix
-  }
+  s.status = newStatus; renderSuppliers();
+  try { await api('PATCH', '/rest/v1/suppliers?id=eq.' + draggedId, { status: newStatus, updated_at: new Date().toISOString() }); toast('Moved to ' + newStatus); }
+  catch(e) { toast('Error', true); loadSuppliers(); }
 }
 
-// Load
-async function load() {
-  try {
-    var data = await api('GET', '/rest/v1/suppliers?select=*&order=created_at.desc');
-    suppliers = data || [];
-  } catch(e) {
-    console.error(e);
-    suppliers = [];
-  }
-  render();
+async function loadSuppliers() {
+  try { suppliers = (await api('GET', '/rest/v1/suppliers?select=*&order=created_at.desc')) || []; }
+  catch(e) { suppliers = []; }
+  renderSuppliers();
 }
 
-function render() {
+function renderSuppliers() {
   var q = document.getElementById('search').value.toLowerCase().trim();
   renderStats();
-  renderBoard(q);
-}
-
-function renderStats() {
-  var counts = {};
-  STATUSES.forEach(function(s) { counts[s] = 0; });
-  var total = 0;
-  suppliers.forEach(function(s) { counts[s.status] = (counts[s.status] || 0) + 1; total++; });
-  var el = document.getElementById('stats');
-  var colors = { all: 'all', Prospects: 'prospects', Contacted: 'contacted', Negotiating: 'negotiating', Sampling: 'sampling', Partners: 'partners' };
-  el.innerHTML = '<div class="stat-card all' + (!filterStatus ? ' active' : '') + '" onclick="setFilter(null)"><div class="num">' + total + '</div><div class="label">Total</div></div>' +
-    STATUSES.map(function(s) { return '<div class="stat-card ' + colors[s] + (filterStatus === s ? ' active' : '') + '" onclick="setFilter(\'' + s + '\')"><div class="num">' + (counts[s]||0) + '</div><div class="label">' + s + '</div></div>'; }).join('');
-}
-
-function setFilter(s) {
-  filterStatus = s;
-  render();
-}
-
-function renderBoard(q) {
   var board = document.getElementById('board');
   board.innerHTML = STATUSES.map(function(status) {
-    var items = suppliers.filter(function(s) {
-      return s.status === status && (!q || s.company.toLowerCase().includes(q));
-    });
+    var items = suppliers.filter(function(s) { return s.status === status && (!q || s.company.toLowerCase().includes(q)); });
     return '<div class="column ' + status.toLowerCase() + '">' +
       '<div class="column-header"><span>' + status + '</span><span class="count">' + items.length + '</span></div>' +
       '<div class="column-body" data-status="' + status + '" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">' +
@@ -372,108 +384,200 @@ function renderBoard(q) {
 }
 
 function renderCard(s) {
-  var notes = s.notes ? s.notes.substring(0, 80) : '';
-  var link = s.storefront_link ? '<a href="' + escAttr(s.storefront_link) + '" target="_blank" class="card-link" onclick="event.stopPropagation()">\u279c Alibaba</a>' : '';
+  var notes = s.notes ? s.notes.substring(0, 70) : '';
+  var link = s.storefront_link ? '<a href="' + escAttr(s.storefront_link) + '" target="_blank" class="card-link" onclick="event.stopPropagation()">➜ Alibaba</a>' : '';
   return '<div class="card" draggable="true" data-id="' + s.id + '" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" onclick="openEditModal(\'' + s.id + '\')">' +
-    '<div class="card-actions">' +
-      '<button class="del-btn" onclick="event.stopPropagation(); deleteSupplier(\'' + s.id + '\',\'' + escAttr(s.company) + '\')">\u2716</button>' +
-    '</div>' +
+    '<div class="card-actions"><button onclick="event.stopPropagation(); deleteSupplier(\'' + s.id + '\',\'' + escAttr(s.company) + '\')">✖</button></div>' +
     '<div class="card-company">' + escHtml(s.company) + '</div>' +
-    '<div class="card-notes">' + escHtml(notes) + (notes.length >= 80 ? '\u2026' : '') + '</div>' +
-    link +
-  '</div>';
+    '<div class="card-notes">' + escHtml(notes) + (notes.length >= 70 ? '…' : '') + '</div>' + link + '</div>';
 }
 
+function renderStats() {
+  var counts = {}; STATUSES.forEach(function(s) { counts[s] = 0; });
+  var total = 0; suppliers.forEach(function(s) { counts[s.status] = (counts[s.status] || 0) + 1; total++; });
+  var el = document.getElementById('stats');
+  el.innerHTML = '<div class="stat-card all' + (!filterStatus ? ' active' : '') + '" onclick="setFilter(null)"><div class="num">' + total + '</div><div class="label">Total</div></div>' +
+    STATUSES.map(function(s) { return '<div class="stat-card ' + s.toLowerCase() + (filterStatus === s ? ' active' : '') + '" onclick="setFilter(\'' + s + '\')"><div class="num">' + (counts[s]||0) + '</div><div class="label">' + s + '</div></div>'; }).join('');
+}
+
+function setFilter(s) { filterStatus = s; renderSuppliers(); }
+
 async function deleteSupplier(id, name) {
-  if (!confirm('Delete \"' + name + '\"?')) return;
-  try {
-    await api('DELETE', '/rest/v1/suppliers?id=eq.' + id);
-    suppliers = suppliers.filter(function(s) { return s.id != id; });
-    render();
-    toast('Deleted ' + name);
-  } catch(e) {
-    toast('Error deleting', true);
-  }
+  if (!confirm('Delete "' + name + '"?')) return;
+  try { await api('DELETE', '/rest/v1/suppliers?id=eq.' + id); suppliers = suppliers.filter(function(s) { return s.id != id; }); renderSuppliers(); toast('Deleted ' + name); }
+  catch(e) { toast('Error', true); }
 }
 
 function openAddModal() {
   document.getElementById('modalTitle').textContent = '+ Add Supplier';
-  document.getElementById('editId').value = '';
-  document.getElementById('fCompany').value = '';
-  document.getElementById('fStorefront').value = '';
-  document.getElementById('fStatus').value = 'Prospects';
-  document.getElementById('fEmail').value = '';
-  document.getElementById('fNotes').value = '';
-  document.getElementById('fVerified').checked = false;
+  document.getElementById('editId').value = ''; document.getElementById('fCompany').value = '';
+  document.getElementById('fStorefront').value = ''; document.getElementById('fStatus').value = 'Prospects';
+  document.getElementById('fEmail').value = ''; document.getElementById('fNotes').value = ''; document.getElementById('fVerified').checked = false;
   document.getElementById('modal').classList.add('open');
   setTimeout(function() { document.getElementById('fCompany').focus(); }, 100);
 }
 
 function openEditModal(id) {
-  var s = suppliers.find(function(s) { return s.id == id; });
-  if (!s) return;
-  document.getElementById('modalTitle').textContent = '\u270f Edit Supplier';
-  document.getElementById('editId').value = id;
-  document.getElementById('fCompany').value = s.company;
-  document.getElementById('fStorefront').value = s.storefront_link || '';
-  document.getElementById('fStatus').value = s.status;
-  document.getElementById('fEmail').value = s.email || '';
-  document.getElementById('fNotes').value = s.notes || '';
+  var s = suppliers.find(function(s) { return s.id == id; }); if (!s) return;
+  document.getElementById('modalTitle').textContent = '✏ Edit Supplier';
+  document.getElementById('editId').value = id; document.getElementById('fCompany').value = s.company;
+  document.getElementById('fStorefront').value = s.storefront_link || ''; document.getElementById('fStatus').value = s.status;
+  document.getElementById('fEmail').value = s.email || ''; document.getElementById('fNotes').value = s.notes || '';
   document.getElementById('fVerified').checked = s.verified_pro || false;
   document.getElementById('modal').classList.add('open');
 }
 
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
 async function saveSupplier() {
   var company = document.getElementById('fCompany').value.trim();
   if (!company) { toast('Company name is required', true); return; }
   var editId = document.getElementById('editId').value;
-  var payload = {
-    company: company,
-    storefront_link: document.getElementById('fStorefront').value.trim(),
-    status: document.getElementById('fStatus').value,
-    email: document.getElementById('fEmail').value.trim(),
-    notes: document.getElementById('fNotes').value.trim(),
-    verified_pro: document.getElementById('fVerified').checked,
-    updated_at: new Date().toISOString()
-  };
+  var payload = { company: company, storefront_link: document.getElementById('fStorefront').value.trim(), status: document.getElementById('fStatus').value, email: document.getElementById('fEmail').value.trim(), notes: document.getElementById('fNotes').value.trim(), verified_pro: document.getElementById('fVerified').checked, updated_at: new Date().toISOString() };
   try {
-    if (editId) {
-      await api('PATCH', '/rest/v1/suppliers?id=eq.' + editId, payload);
-      var idx = suppliers.findIndex(function(s) { return s.id == editId; });
-      if (idx >= 0) suppliers[idx] = Object.assign({}, suppliers[idx], payload);
-      toast('Updated ' + company);
+    if (editId) { await api('PATCH', '/rest/v1/suppliers?id=eq.' + editId, payload); var idx = suppliers.findIndex(function(s) { return s.id == editId; }); if (idx >= 0) suppliers[idx] = Object.assign({}, suppliers[idx], payload); toast('Updated ' + company); }
+    else { var data = await api('POST', '/rest/v1/suppliers', payload); if (data) suppliers.unshift(data[0]); toast('Added ' + company); }
+    closeModal(); renderSuppliers();
+  } catch(e) { toast('Error: ' + e.message, true); }
+}
+
+// ============================================================
+// BRIEFS MODULE
+// ============================================================
+let briefs = [];
+let currentBriefId = null;
+let autoSaveTimer = null;
+
+function todayStr() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
+async function loadBriefs() {
+  try { briefs = (await api('GET', '/rest/v1/daily_briefs?select=*&order=brief_date.desc')) || []; }
+  catch(e) { briefs = []; }
+  renderBriefList();
+  // If we have a current brief or today's brief exists
+  if (currentBriefId) { openBrief(currentBriefId); }
+  else { var todaysBrief = briefs.find(function(b) { return b.brief_date === todayStr(); }); if (todaysBrief) { openBrief(todaysBrief.id); } else { newBrief(); } }
+}
+
+function renderBriefList() {
+  var el = document.getElementById('briefList');
+  el.innerHTML = briefs.map(function(b) {
+    var title = b.title || '(untitled)';
+    return '<div class="brief-list-item' + (b.id == currentBriefId ? ' active' : '') + '" onclick="openBrief(' + b.id + ')">' +
+      '<div class="date-label">' + b.brief_date + '</div>' +
+      '<div class="title-preview">' + escHtml(title) + '</div></div>';
+  }).join('');
+}
+
+function newBrief() {
+  currentBriefId = null;
+  document.getElementById('briefEditor').innerHTML =
+    '<div class="brief-date-row">' +
+      '<label class="section-label" style="margin:0">Date</label>' +
+      '<input type="date" id="briefDate" value="' + todayStr() + '" />' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">Title</div>' +
+      '<input type="text" class="brief-title-input" id="briefTitle" placeholder="Brief title..." />' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">🎯 Top Priorities (one per line)</div>' +
+      '<textarea id="briefPriorities" rows="4" placeholder="1. ...\n2. ...\n3. ..."></textarea>' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">📋 Tasks / Action Items</div>' +
+      '<textarea id="briefTasks" rows="6" placeholder="- Task 1\n- Task 2\n- Task 3"></textarea>' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">📝 Notes / Misc</div>' +
+      '<textarea id="briefNotes" rows="5" placeholder="Any other notes..."></textarea>' +
+    '</div>' +
+    '<div class="save-bar">' +
+      '<button class="btn btn-primary" onclick="saveBrief()">💾 Save Brief</button>' +
+      '<span class="save-status" id="saveStatus"></span>' +
+    '</div>';
+  renderBriefList();
+}
+
+function openBrief(id) {
+  var b = briefs.find(function(b) { return b.id == id; });
+  if (!b) return;
+  currentBriefId = b.id;
+  renderBriefList();
+  document.getElementById('briefEditor').innerHTML =
+    '<div class="brief-date-row">' +
+      '<label class="section-label" style="margin:0">Date</label>' +
+      '<input type="date" id="briefDate" value="' + b.brief_date + '" />' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">Title</div>' +
+      '<input type="text" class="brief-title-input" id="briefTitle" placeholder="Brief title..." value="' + escAttr(b.title||'') + '" />' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">🎯 Top Priorities</div>' +
+      '<textarea id="briefPriorities" rows="4">' + escTextarea(b.priorities||'') + '</textarea>' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">📋 Tasks / Action Items</div>' +
+      '<textarea id="briefTasks" rows="6">' + escTextarea(b.tasks||'') + '</textarea>' +
+    '</div>' +
+    '<div class="section-card">' +
+      '<div class="section-label">📝 Notes</div>' +
+      '<textarea id="briefNotes" rows="5">' + escTextarea(b.notes||'') + '</textarea>' +
+    '</div>' +
+    '<div class="save-bar">' +
+      '<button class="btn btn-primary" onclick="saveBrief()">💾 Save Brief</button>' +
+      '<button class="btn btn-sm" onclick="deleteBrief(' + b.id + ')" style="color:var(--red)">Delete</button>' +
+      '<span class="save-status" id="saveStatus">Saved</span>' +
+    '</div>';
+}
+
+async function saveBrief() {
+  var date = document.getElementById('briefDate').value;
+  var title = document.getElementById('briefTitle').value.trim();
+  var priorities = document.getElementById('briefPriorities').value.trim();
+  var tasks = document.getElementById('briefTasks').value.trim();
+  var notes = document.getElementById('briefNotes').value.trim();
+  if (!date) { toast('Date is required', true); return; }
+  var payload = { brief_date: date, title: title, priorities: priorities, tasks: tasks, notes: notes, updated_at: new Date().toISOString() };
+  try {
+    if (currentBriefId) {
+      await api('PATCH', '/rest/v1/daily_briefs?id=eq.' + currentBriefId, payload);
+      var idx = briefs.findIndex(function(b) { return b.id == currentBriefId; });
+      if (idx >= 0) briefs[idx] = Object.assign({}, briefs[idx], payload);
+      document.getElementById('saveStatus').textContent = '✅ Saved';
     } else {
-      var data = await api('POST', '/rest/v1/suppliers', payload);
-      if (data) suppliers.unshift(data[0]);
-      toast('Added ' + company);
+      var data = await api('POST', '/rest/v1/daily_briefs', payload);
+      if (data) { briefs.unshift(data[0]); currentBriefId = data[0].id; }
+      document.getElementById('saveStatus').textContent = '✅ Created';
     }
-    closeModal();
-    render();
-  } catch(e) {
-    toast('Error: ' + e.message, true);
-  }
+    renderBriefList();
+    setTimeout(function() { var el = document.getElementById('saveStatus'); if (el) el.textContent = 'Saved'; }, 2000);
+    toast('Brief saved!');
+  } catch(e) { toast('Error: ' + e.message, true); document.getElementById('saveStatus').textContent = '❌ Error'; }
 }
 
+async function deleteBrief(id) {
+  if (!confirm('Delete this brief?')) return;
+  try { await api('DELETE', '/rest/v1/daily_briefs?id=eq.' + id); briefs = briefs.filter(function(b) { return b.id != id; }); currentBriefId = null; newBrief(); toast('Brief deleted'); }
+  catch(e) { toast('Error', true); }
+}
+
+// ===== SHARED UTILS =====
 function toast(msg, isError) {
-  var t = document.createElement('div');
-  t.className = 'toast';
-  t.style.color = isError ? 'var(--red)' : 'var(--green)';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function() { t.remove(); }, 2500);
+  var t = document.createElement('div'); t.className = 'toast';
+  t.style.color = isError ? 'var(--red)' : 'var(--green)'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(function() { t.remove(); }, 2500);
 }
-
 function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-function escAttr(s) { return ('' + s).replace(/&/g,'&amp;').replace(/'/g,'&apos;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return (''+s).replace(/&/g,'&amp;').replace(/'/g,'&apos;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escTextarea(s) { return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
-load();
+// Boot
+loadSuppliers();
 </script>
 </body>
 </html>
