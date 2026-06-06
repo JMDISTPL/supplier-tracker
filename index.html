@@ -413,52 +413,56 @@
 
 <!-- FLOW PAGE -->
 <div id="page-flow" class="page" style="padding:0;overflow:hidden">
-  <div style="flex:1;overflow-x:auto;overflow-y:hidden;padding:16px 20px" id="flowContainer">
-    <div style="display:flex;align-items:flex-start;gap:0;min-height:calc(100vh - 100px);white-space:nowrap" id="flowRow"></div>
+  <div style="flex:1;overflow-x:auto;overflow-y:auto;padding:24px 32px" id="flowContainer">
+    <div style="min-width:max-content;padding-bottom:20px">
+      <h2 style="font-size:20px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px">🗺️ Private Label Flow</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:16px">End-to-end Amazon Private Label workflow</p>
+      <div style="display:flex;align-items:flex-start;gap:0" id="flowRow"></div>
+    </div>
   </div>
 </div>
 
 <style>
-  .f-node {
-    display:inline-flex; align-items:center; gap:6px;
-    background:var(--surface); border:1px solid var(--border); border-radius:8px;
-    padding:6px 10px; cursor:default; transition:border-color .15s; white-space:nowrap;
-    font-size:12px; font-weight:500; line-height:1.2; flex-shrink:0;
+  .fn {
+    display:inline-flex; flex-direction:column;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:10px 14px; cursor:default; transition:border-color .15s, box-shadow .15s;
+    white-space:nowrap; flex-shrink:0; min-width:0;
   }
-  .f-node:hover { border-color:var(--accent); }
-  .f-node .fi { font-size:14px; }
-  .f-node.start { border-color:var(--accent); }
-  .f-node.decision { border-color:var(--orange); }
-  .f-node.success { border-color:var(--green); }
-  .f-node.warn { border-color:var(--red); }
+  .fn:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .fn .fn-row1 { display:flex; align-items:center; gap:8px; }
+  .fn .fn-icon { font-size:18px; }
+  .fn .fn-title { font-size:14px; font-weight:600; line-height:1.3; }
+  .fn .fn-meta { font-size:11px; color:var(--text2); margin-top:3px; line-height:1.3; white-space:nowrap; }
+  .fn.start { border-color:var(--accent); }
+  .fn.decision { border-color:var(--orange); }
+  .fn.success { border-color:var(--green); }
+  .fn.warn { border-color:var(--red); }
 
-  .f-col { display:inline-flex; flex-direction:column; align-items:center; flex-shrink:0; }
-  .f-row { display:inline-flex; align-items:center; gap:0; }
-  .f-arr { color:var(--text2); font-size:12px; margin:0 -2px; flex-shrink:0; }
-  .f-line { width:20px; height:2px; background:var(--border); flex-shrink:0; }
-  .f-vline { width:2px; height:14px; background:var(--border); flex-shrink:0; }
+  .fa { color:var(--text2); font-size:16px; margin:0 4px; flex-shrink:0; align-self:center; }
+  .fl { width:28px; height:2px; background:var(--border); flex-shrink:0; align-self:center; }
 
-  .f-branch {
+  .fb {
     display:inline-flex; flex-direction:column; align-items:center;
-    position:relative; padding:0 4px;
+    position:relative; padding:0 4px; flex-shrink:0;
   }
-  .f-branch::before {
+  .fb::before {
     content:''; position:absolute; top:50%; left:0; right:0;
     height:2px; background:var(--border);
   }
-  .f-branch-top, .f-branch-bot {
-    display:flex; align-items:center; gap:4px; padding:4px 0; position:relative;
+  .fb-top, .fb-bot {
+    display:flex; align-items:center; gap:6px; padding:6px 0; position:relative;
   }
-  .f-branch-top::after {
-    content:''; position:absolute; bottom:-4px; left:50%;
-    width:2px; height:4px; background:var(--border);
+  .fb-top::after {
+    content:''; position:absolute; bottom:-6px; left:50%;
+    width:2px; height:6px; background:var(--border);
   }
-  .f-branch-bot::before {
-    content:''; position:absolute; top:-4px; left:50%;
-    width:2px; height:4px; background:var(--border);
+  .fb-bot::before {
+    content:''; position:absolute; top:-6px; left:50%;
+    width:2px; height:6px; background:var(--border);
   }
-  .f-bl { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.3px; margin:0 4px; }
-  .f-loop { font-size:10px; color:var(--orange); display:inline-flex; align-items:center; gap:3px; }
+  .fbl { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.4px; font-weight:600; margin:0 6px; }
+  .flo { font-size:11px; color:var(--orange); display:inline-flex; align-items:center; gap:4px; font-weight:500; }
 </style>
 
 <script>
@@ -466,60 +470,53 @@
   var row = document.getElementById('flowRow');
   if (!row) return;
 
-  function n(icon, text, cls) {
-    return '<span class="f-node ' + (cls||'') + '"><span class="fi">' + icon + '</span>' + text + '</span>';
+  function n(icon, title, meta, cls) {
+    return '<div class="fn '+(cls||'')+'"><div class="fn-row1"><span class="fn-icon">'+icon+'</span><span class="fn-title">'+title+'</span></div>'+(meta?'<div class="fn-meta">'+meta+'</div>':'')+'</div>';
   }
-  function arr() { return '<span class="f-arr">▸</span>'; }
-  function line() { return '<span class="f-line"></span>'; }
-  function col() { return '<span class="f-col">'; }
-  function _col() { return '</span>'; }
-
-  function branch(topHtml, botHtml, topLabel, botLabel) {
-    return '<span class="f-branch"><span class="f-branch-top">' + (topLabel ? '<span class="f-bl">' + topLabel + '</span>' : '') + topHtml + '</span><span class="f-branch-bot">' + (botLabel ? '<span class="f-bl">' + botLabel + '</span>' : '') + botHtml + '</span></span>';
+  function a() { return '<span class="fa">▸</span>'; }
+  function l() { return '<span class="fl"></span>'; }
+  function br(top, bot, tlab, blab) {
+    return '<span class="fb"><span class="fb-top">'+(tlab?'<span class="fbl">'+tlab+'</span>':'')+top+'</span><span class="fb-bot">'+(blab?'<span class="fbl">'+blab+'</span>':'')+bot+'</span></span>';
   }
 
   var h = '';
-  h += col();
-  h += n('📋', 'Get Tools', 'start') + arr() + line();
-  h += n('🔍', 'Find Product') + arr() + line();
-  h += n('🏢', 'LLC') + arr() + line();
-  h += n('🛒', 'Seller Account') + arr() + line();
-  h += n('🏦', 'Bank Accounts') + arr() + line();
-  h += n('🔍', 'Find Product') + arr() + line();
-  h += n('📞', 'Contact 5-10');
-  h += arr() + line();
-  h += branch(
-    n('❌', 'Bad Samples', 'warn') + arr() + '<span class="f-loop">↩ Contact</span>',
-    n('✅', 'Good Samples', 'success'),
-    'FAIL', 'PASS'
+  h += n('📋','Get Accounts','Alibaba, Helium 10, JungleScout, Sellerboard','start')+a()+l();
+  h += n('🔍','Find Winning Product','Market research, keywords, competition')+a()+l();
+  h += n('🏢','Setup LLC','Legal entity for Amazon business')+a()+l();
+  h += n('🛒','Create Seller Account','Under your LLC')+a()+l();
+  h += n('🏦','Setup Bank Accounts','Business banking, clean accounting')+a()+l();
+  h += n('🔍','Find Winning Product','Validate margins, demand, fit')+a()+l();
+  h += n('📞','Contact 5-10 Suppliers','Reach out on Alibaba');
+  h += a()+l();
+  h += br(
+    n('❌','Bad Samples','Revise, retry','warn')+a()+'<span class="flo">↩ Contact</span>',
+    n('✅','Good Samples','Proceed with supplier','success'),
+    'SAMPLES FAIL','SAMPLES PASS'
   );
-  h += arr() + line();
-  h += n('📦', 'Order 3 Samples') + arr() + line();
-  h += n('🏆', 'Best Seller') + arr() + line();
-  h += n('⚖️', 'Best Supplier') + arr() + line();
-  h += n('✏️', 'Negotiate') + arr() + line();
-  h += n('📊', 'Barcodes') + arr() + line();
-  h += n('📄', 'Dummy Listing') + arr() + line();
-  h += n('💰', '30-50% Deposit') + arr() + line();
-  h += n('🔎', 'Inspection', 'decision');
-  h += arr() + line();
-  h += branch(
-    n('⚠️', 'Issues?', 'warn') + arr() + '<span class="f-loop">↩ Contact</span>',
-    n('✅', 'Passed', 'success'),
-    'FAIL', 'PASS'
+  h += a()+l();
+  h += n('📦','Order 3 Samples','Compare quality, pricing, lead time')+a()+l();
+  h += n('🏆','Best Seller Sample','Final sample from top supplier')+a()+l();
+  h += n('⚖️','Best Supplier','Quality vs. price decision')+a()+l();
+  h += n('✏️','Negotiate Changes','Product specs + custom packaging')+a()+l();
+  h += n('📊','Register Barcodes','UPC/EAN codes')+a()+l();
+  h += n('📄','Dummy Listing','Draft while waiting')+a()+l();
+  h += n('💰','30-50% Deposit','Secure production slot')+a()+l();
+  h += n('🔎','Product Inspection','Third-party QC (QIMA)','decision');
+  h += a()+l();
+  h += br(
+    n('⚠️','Major Issues?','Quality fails','warn')+a()+'<span class="flo">↩ Contact</span>',
+    n('✅','No Issues','Inspection passed','success'),
+    'FAILED','PASSED'
   );
-  h += arr() + line();
-  // Double branch
-  h += '<span class="f-branch"><span class="f-branch-top">' +
-    n('📷', 'Listing Team') + arr() + line() + n('🔄', 'Revise Listing') +
-  '</span><span class="f-branch-bot">' +
-    n('🚚', 'Shipping+FNSKU') +
-  '</span></span>';
-  h += arr() + line();
-  h += n('⭐', 'FNF Reviews') + arr() + line();
-  h += n('®️', 'Brand Registry') + arr() + line();
-  h += n('🌿', 'Amazon Vine', 'success');
-  h += _col();
+  h += a()+l();
+  h += br(
+    n('📷','Listing Team','Photos & listing creation')+a()+l()+n('🔄','Revise Listing','2+ weeks while waiting'),
+    n('🚚','Shipping+FNSKUs','Set plan, manufacturer ships to Amazon')
+  );
+  h += a()+l();
+  h += n('⭐','FNF Reviews','Friends & Family early reviews')+a()+l();
+  h += n('®️','Brand Registry','Trademark + enroll')+a()+l();
+  h += n('🌿','Amazon Vine','Verified reviews program','success');
 
   row.innerHTML = h;
 })();
