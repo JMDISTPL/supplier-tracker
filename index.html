@@ -448,24 +448,46 @@ function renderBriefChat(id) {
   currentBriefId = b.id; renderBriefList();
   
   var dateStr = b.brief_date;
-  // Format date nicely
   var parts = dateStr.split('-');
   var d = new Date(parts[0], parts[1]-1, parts[2]);
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var formatted = dayNames[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
 
-  var sections = [];
-  if (b.priorities) sections.push({icon:'\ud83c\udfaf', label:'Top Priorities', content:b.priorities});
-  if (b.tasks) sections.push({icon:'\ud83d\udccb', label:'Tasks / Action Items', content:b.tasks});
-  if (b.notes) sections.push({icon:'\ud83d\udcdd', label:'Notes', content:b.notes});
-
-  var html = '<div class="brief-entry"><div class="brief-date-header"><span class="title">'+(b.title||'Daily Brief')+'</span><span>'+formatted+'</span></div>';
-  sections.forEach(function(s) {
-    html += '<div class="section-block"><div class="section-label"><span>'+s.icon+'</span>'+s.label+'</div><div class="section-content">'+escHtml(s.content)+'</div></div>';
+  var content = b.notes || '';
+  content = content.replace(/\[color\]D([+-][0-9.]+%)/g, function(m,p) {
+    var clr = p.startsWith('+') ? 'var(--green)' : 'var(--red)';
+    var emoji = p.startsWith('+') ? '\ud83d\udfe2' : '\ud83d\udd34';
+    return emoji + '<span style="color:'+clr+';font-weight:600">D' + p + '</span>';
   });
-  html += '</div>';
-  document.getElementById('briefChat').innerHTML = html;
+  content = content.replace(/\[color\]W([+-][0-9.]+%)/g, function(m,p) {
+    var clr = p.startsWith('+') ? 'var(--green)' : 'var(--red)';
+    var emoji = p.startsWith('+') ? '\ud83d\udfe2' : '\ud83d\udd34';
+    return emoji + '<span style="color:'+clr+';font-weight:600">W' + p + '</span>';
+  });
+  content = content.replace(/\[color\]M([+-][0-9.]+%)/g, function(m,p) {
+    var clr = p.startsWith('+') ? 'var(--green)' : 'var(--red)';
+    var emoji = p.startsWith('+') ? '\ud83d\udfe2' : '\ud83d\udd34';
+    return emoji + '<span style="color:'+clr+';font-weight:600">M' + p + '</span>';
+  });
+
+  content = content.split('\n').map(function(line) {
+    if (line.startsWith('Good morning') || line.startsWith('Good')) {
+      return '<div style="font-size:16px;font-weight:600;margin-bottom:12px">' + escHtml(line) + '</div>';
+    }
+    if (line.startsWith('\ud83d\udcaa') || line.startsWith('\ud83d\udcd6') || line.startsWith('\ud83d\udcac') || line.startsWith('\ud83d\udcca') || line.startsWith('\ud83d\udcf0') || line.startsWith('\ud83c\udf0d')) {
+      return '<div style="font-size:13px;font-weight:700;color:var(--accent);margin-top:16px;margin-bottom:6px">' + escHtml(line) + '</div>';
+    }
+    if (line.startsWith('\u2022')) {
+      return '<div style="margin-bottom:3px;padding-left:8px">' + escHtml(line) + '</div>';
+    }
+    if (line.trim() === '') return '';
+    return '<div style="margin-bottom:2px">' + escHtml(line) + '</div>';
+  }).join('');
+
+  document.getElementById('briefChat').innerHTML =
+    '<div class="brief-entry"><div class="brief-date-header"><span class="title">' + escHtml(b.title||'Daily Brief') + '</span><span>' + formatted + '</span></div>' +
+    '<div style="line-height:1.7">' + content + '</div></div>';
 }
 
 // ===== UTILS =====
