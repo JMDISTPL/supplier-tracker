@@ -422,20 +422,30 @@
 
 <style>
   .fg {
-    display:flex; flex-direction:column;
-    background:var(--surface); border:1px solid var(--border); border-radius:10px;
-    padding:10px 12px; cursor:default; transition:border-color .15s, box-shadow .15s;
-    width:calc(20% - 8px); min-width:0; box-sizing:border-box;
-  }
-  .fg:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
-  .fg .fg-r1 { display:flex; align-items:center; gap:6px; }
-  .fg .fg-ic { font-size:16px; }
-  .fg .fg-ti { font-size:13px; font-weight:600; line-height:1.3; }
-  .fg .fg-me { font-size:10px; color:var(--text2); margin-top:2px; line-height:1.3; }
-  .fg.start { border-color:var(--accent); }
-  .fg.decision { border-color:var(--orange); }
-  .fg.success { border-color:var(--green); }
-  .fg.warn { border-color:var(--red); }
+      display:flex; flex-direction:column;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      padding:10px 12px; cursor:pointer; transition:border-color .15s, box-shadow .15s, background .2s;
+      width:calc(20% - 8px); min-width:0; box-sizing:border-box; position:relative;
+    }
+    .fg:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+    .fg .fg-r1 { display:flex; align-items:center; gap:6px; }
+    .fg .fg-ic { font-size:16px; }
+    .fg .fg-ti { font-size:13px; font-weight:600; line-height:1.3; }
+    .fg .fg-me { font-size:10px; color:var(--text2); margin-top:2px; line-height:1.3; }
+    .fg.start { border-color:var(--accent); }
+    .fg.decision { border-color:var(--orange); }
+    .fg.success { border-color:var(--green); }
+    .fg.warn { border-color:var(--red); }
+    /* Completed state */
+    .fg.done { background:var(--green); border-color:var(--green); }
+    .fg.done:hover { background:#16a34a; border-color:#16a34a; }
+    .fg.done .fg-ti { color:white; }
+    .fg.done .fg-me { color:rgba(255,255,255,.8); }
+    .fg.done .fg-ic { filter:brightness(10); }
+    .fg.done::after {
+      content:'✓'; position:absolute; top:4px; right:7px;
+      color:white; font-size:16px; font-weight:700; line-height:1;
+    }
 
   .fg-arr {
     display:flex; align-items:center; justify-content:center;
@@ -448,20 +458,30 @@
 
   /* Branch card - stacks two paths vertically */
   .fg-br {
-    display:flex; flex-direction:column; gap:4px;
-    background:var(--surface); border:1px solid var(--border); border-radius:10px;
-    padding:6px 10px; cursor:default; transition:border-color .15s;
-    width:calc(20% - 8px); min-width:0; box-sizing:border-box;
-  }
-  .fg-br:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
-  .fg-br .br-row { display:flex; align-items:center; gap:4px; font-size:12px; line-height:1.2; }
-  .fg-br .br-row .bri { font-size:13px; }
-  .fg-br .br-row .brt { font-weight:500; }
-  .fg-br .br-row.fail { color:var(--red); }
-  .fg-br .br-row.pass { color:var(--green); }
-  .fg-br .br-row .loop { color:var(--orange); font-size:10px; margin-left:auto; display:flex; align-items:center; gap:2px; }
-  .fg-br .br-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.3px; font-weight:600; }
-  .fg-br .br-div { height:1px; background:var(--border); margin:2px 0; }
+      display:flex; flex-direction:column; gap:4px;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      padding:6px 10px; cursor:pointer; transition:border-color .15s, background .2s;
+      width:calc(20% - 8px); min-width:0; box-sizing:border-box; position:relative;
+    }
+    .fg-br:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+    .fg-br .br-row { display:flex; align-items:center; gap:4px; font-size:12px; line-height:1.2; }
+    .fg-br .br-row .bri { font-size:13px; }
+    .fg-br .br-row .brt { font-weight:500; }
+    .fg-br .br-row.fail { color:var(--red); }
+    .fg-br .br-row.pass { color:var(--green); }
+    .fg-br .br-row .loop { color:var(--orange); font-size:10px; margin-left:auto; display:flex; align-items:center; gap:2px; }
+    .fg-br .br-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.3px; font-weight:600; }
+    .fg-br .br-div { height:1px; background:var(--border); margin:2px 0; }
+    /* Branch completed state */
+    .fg-br.done { background:var(--green); border-color:var(--green); }
+    .fg-br.done:hover { background:#16a34a; border-color:#16a34a; }
+    .fg-br.done .br-row, .fg-br.done .br-label, .fg-br.done .loop { color:white; }
+    .fg-br.done .br-div { background:rgba(255,255,255,.3); }
+    .fg-br.done .bri { filter:brightness(10); }
+    .fg-br.done::after {
+      content:'✓'; position:absolute; top:4px; right:7px;
+      color:white; font-size:14px; font-weight:700; line-height:1;
+    }
 
   /* Legend */
   .fg-legend { display:flex; gap:16px; margin-top:16px; flex-wrap:wrap; font-size:11px; color:var(--text2); }
@@ -473,13 +493,11 @@
 (function(){
   var grid = document.getElementById('flowGrid');
   if (!grid) return;
+  var FLOW_KEY = 'jmpl_flow_done';
 
   function cell(icon, title, meta, cls) {
     return '<div class="fg '+(cls||'')+'"><div class="fg-r1"><span class="fg-ic">'+icon+'</span><span class="fg-ti">'+title+'</span></div>'+(meta?'<div class="fg-me">'+meta+'</div>':'')+'</div>';
   }
-  function arr() { return '<div class="fg-arr">▸</div>'; }
-  function arrD() { return '<div class="fg-arr-down">▼</div>'; }
-  function spacer() { return '<div style="width:calc(20% - 8px)"></div>'; }
 
   function branch(topRow, botRow, tLabel, bLabel) {
     return '<div class="fg-br">' +
@@ -491,72 +509,78 @@
     '</div>';
   }
 
-  var items = [];
-  // Build all grid items in order
-  items.push({html: cell('📋','Get Accounts','Alibaba, Helium 10, JungleScout','start')});
-  items.push({html: cell('🔍','Find Winning Product','Market research, keywords')});
-  items.push({html: cell('🏢','Setup LLC','Legal entity for Amazon')});
-  items.push({html: cell('🛒','Create Seller Account','Under your LLC')});
-  items.push({html: cell('🏦','Setup Bank Accounts','Business banking' )});
+  var items = [
+    cell('📋','Get Accounts','Alibaba, Helium 10, JungleScout','start'),
+    cell('🔍','Find Winning Product','Market research, keywords'),
+    cell('🏢','Setup LLC','Legal entity for Amazon'),
+    cell('🛒','Create Seller Account','Under your LLC'),
+    cell('🏦','Setup Bank Accounts','Business banking'),
 
-  items.push({html: cell('🔍','Find Winning Product','Validate margins, demand')});
-  items.push({html: cell('📞','Contact 5-10 Suppliers','Reach out on Alibaba')});
-  items.push({html: branch(
-    '<span class="bri">✅</span><span class="brt">Good Samples</span>',
-    '<span class="bri">❌</span><span class="brt">Bad Samples</span><span class="loop">↩ Contact</span>',
-    'PASS', 'FAIL'
-  )});
-  items.push({html: cell('📦','Order 3 Samples','Compare quality, pricing')});
-  items.push({html: cell('🏆','Best Seller Sample','Final from top supplier')});
+    cell('🔍','Find Winning Product','Validate margins, demand'),
+    cell('📞','Contact 5-10 Suppliers','Reach out on Alibaba'),
+    branch('✅ Good Samples','❌ Bad Samples ↩ Contact','PASS','FAIL'),
+    cell('📦','Order 3 Samples','Compare quality, pricing'),
+    cell('🏆','Best Seller Sample','Final from top supplier'),
 
-  items.push({html: cell('⚖️','Best Supplier','Quality vs. price')});
-  items.push({html: cell('✏️','Negotiate Changes','Product + packaging')});
-  items.push({html: cell('📊','Register Barcodes','UPC/EAN codes')});
-  items.push({html: cell('📄','Dummy Listing','Draft while waiting')});
-  items.push({html: cell('💰','30-50% Deposit','Secure production slot')});
+    cell('⚖️','Best Supplier','Quality vs. price'),
+    cell('✏️','Negotiate Changes','Product + packaging'),
+    cell('📊','Register Barcodes','UPC/EAN codes'),
+    cell('📄','Dummy Listing','Draft while waiting'),
+    cell('💰','30-50% Deposit','Secure production slot'),
 
-  items.push({html: cell('🔎','Product Inspection','Third-party QC (QIMA)','decision')});
-  items.push({html: branch(
-    '<span class="bri">✅</span><span class="brt">No Issues</span>',
-    '<span class="bri">⚠️</span><span class="brt">Major Issues?</span><span class="loop">↩ Contact</span>',
-    'PASS', 'FAIL'
-  )});
-  items.push({html: branch(
-    '<span class="bri">📷</span><span class="brt">Listing Team</span><span class="fg-arr" style="font-size:10px">▸</span><span class="bri">🔄</span><span class="brt">Revise Listing</span>',
-    '<span class="bri">🚚</span><span class="brt">Shipping+FNSKUs</span>',
-    'LISTING PREP', 'SHIPPING'
-  )});
-  items.push({html: cell('⭐','FNF Reviews','Friends & Family')});
-  items.push({html: cell('®️','Brand Registry','Trademark + enroll')});
+    cell('🔎','Product Inspection','Third-party QC (QIMA)','decision'),
+    branch('✅ No Issues','⚠️ Major Issues? ↩ Contact','PASS','FAIL'),
+    branch('📷 Listing → 🔄 Revise','🚚 Shipping+FNSKUs','LISTING PREP','SHIPPING'),
+    cell('⭐','FNF Reviews','Friends & Family'),
+    cell('®️','Brand Registry','Trademark + enroll'),
 
-  items.push({html: cell('🌿','Amazon Vine','Verified reviews program','success')});
+    cell('🌿','Amazon Vine','Verified reviews program','success')
+  ];
 
-  // Render as grid: 5 per row with arrows between items and down arrows between rows
+  // Load saved state
+  var done = {};
+  try { done = JSON.parse(localStorage.getItem(FLOW_KEY)) || {}; } catch(e) {}
+
   var html = '';
   var perRow = 5;
+
+  function toggle(i) {
+    done[i] = !done[i];
+    localStorage.setItem(FLOW_KEY, JSON.stringify(done));
+    var els = grid.querySelectorAll('.fg, .fg-br');
+    if (els[i]) {
+      els[i].classList.toggle('done', done[i]);
+    }
+  }
 
   for (var i = 0; i < items.length; i++) {
     var col = i % perRow;
 
     if (col === 0 && i > 0) {
-      // End previous row
       html += '</div>';
-      // Add down arrow for next row
       html += '<div style="width:100%;display:flex;justify-content:center;padding:4px 0">▼</div>';
     }
-
     if (col === 0) {
       html += '<div style="display:flex;align-items:center;gap:6px;width:100%">';
     }
-
-    // Add arrow before item (except first in row)
     if (col > 0) {
       html += '<div class="fg-arr">▸</div>';
     }
 
-    html += items[i].html;
+    // Add onclick and done class
+    var itemHtml = items[i];
+    var cls = done[i] ? ' done' : '';
+    var isBranch = itemHtml.indexOf('fg-br') >= 0;
+    if (isBranch) {
+      itemHtml = itemHtml.replace('class="fg-br', 'class="fg-br' + cls);
+    } else {
+      itemHtml = itemHtml.replace('class="fg', 'class="fg' + cls);
+    }
+    // Add onclick
+    itemHtml = itemHtml.replace('<div', '<div onclick="flowClick('+i+')"');
+
+    html += itemHtml;
   }
-  // Close last row
   html += '</div>';
 
   // Add legend
@@ -566,9 +590,13 @@
     '<span><span class="sw" style="background:var(--orange)"></span> Decision</span>' +
     '<span><span class="sw" style="background:var(--red)"></span> Warning</span>' +
     '<span><span class="sw" style="background:var(--surface);border-color:var(--border)"></span> Step</span>' +
+    '<span style="margin-left:8px">💡 Click to mark complete</span>' +
   '</div>';
 
   grid.innerHTML = html;
+
+  // Global toggle function
+  window.flowClick = toggle;
 })();
 </script>
 
