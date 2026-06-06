@@ -413,112 +413,162 @@
 
 <!-- FLOW PAGE -->
 <div id="page-flow" class="page" style="padding:0;overflow:hidden">
-  <div style="flex:1;overflow-x:auto;overflow-y:auto;padding:24px 32px" id="flowContainer">
-    <div style="min-width:max-content;padding-bottom:20px">
-      <h2 style="font-size:20px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px">🗺️ Private Label Flow</h2>
-      <p style="color:var(--text2);font-size:13px;margin-bottom:16px">End-to-end Amazon Private Label workflow</p>
-      <div style="display:flex;align-items:flex-start;gap:0" id="flowRow"></div>
-    </div>
+  <div style="flex:1;overflow-y:auto;padding:20px 24px" id="flowContainer">
+    <h2 style="font-size:20px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px">🗺️ Private Label Flow</h2>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:16px">End-to-end Amazon Private Label workflow</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start" id="flowGrid"></div>
   </div>
 </div>
 
 <style>
-  .fn {
-    display:inline-flex; flex-direction:column;
+  .fg {
+    display:flex; flex-direction:column;
     background:var(--surface); border:1px solid var(--border); border-radius:10px;
-    padding:10px 14px; cursor:default; transition:border-color .15s, box-shadow .15s;
-    white-space:nowrap; flex-shrink:0; min-width:0;
+    padding:10px 12px; cursor:default; transition:border-color .15s, box-shadow .15s;
+    width:calc(20% - 8px); min-width:0; box-sizing:border-box;
   }
-  .fn:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
-  .fn .fn-row1 { display:flex; align-items:center; gap:8px; }
-  .fn .fn-icon { font-size:18px; }
-  .fn .fn-title { font-size:14px; font-weight:600; line-height:1.3; }
-  .fn .fn-meta { font-size:11px; color:var(--text2); margin-top:3px; line-height:1.3; white-space:nowrap; }
-  .fn.start { border-color:var(--accent); }
-  .fn.decision { border-color:var(--orange); }
-  .fn.success { border-color:var(--green); }
-  .fn.warn { border-color:var(--red); }
+  .fg:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .fg .fg-r1 { display:flex; align-items:center; gap:6px; }
+  .fg .fg-ic { font-size:16px; }
+  .fg .fg-ti { font-size:13px; font-weight:600; line-height:1.3; }
+  .fg .fg-me { font-size:10px; color:var(--text2); margin-top:2px; line-height:1.3; }
+  .fg.start { border-color:var(--accent); }
+  .fg.decision { border-color:var(--orange); }
+  .fg.success { border-color:var(--green); }
+  .fg.warn { border-color:var(--red); }
 
-  .fa { color:var(--text2); font-size:16px; margin:0 4px; flex-shrink:0; align-self:center; }
-  .fl { width:28px; height:2px; background:var(--border); flex-shrink:0; align-self:center; }
+  .fg-arr {
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text2); font-size:14px; flex-shrink:0;
+  }
+  .fg-arr-down {
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text2); font-size:14px; width:100%; padding:2px 0;
+  }
 
-  .fb {
-    display:inline-flex; flex-direction:column; align-items:center;
-    position:relative; padding:0 4px; flex-shrink:0;
+  /* Branch card - stacks two paths vertically */
+  .fg-br {
+    display:flex; flex-direction:column; gap:4px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:6px 10px; cursor:default; transition:border-color .15s;
+    width:calc(20% - 8px); min-width:0; box-sizing:border-box;
   }
-  .fb::before {
-    content:''; position:absolute; top:50%; left:0; right:0;
-    height:2px; background:var(--border);
-  }
-  .fb-top, .fb-bot {
-    display:flex; align-items:center; gap:6px; padding:6px 0; position:relative;
-  }
-  .fb-top::after {
-    content:''; position:absolute; bottom:-6px; left:50%;
-    width:2px; height:6px; background:var(--border);
-  }
-  .fb-bot::before {
-    content:''; position:absolute; top:-6px; left:50%;
-    width:2px; height:6px; background:var(--border);
-  }
-  .fbl { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.4px; font-weight:600; margin:0 6px; }
-  .flo { font-size:11px; color:var(--orange); display:inline-flex; align-items:center; gap:4px; font-weight:500; }
+  .fg-br:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+  .fg-br .br-row { display:flex; align-items:center; gap:4px; font-size:12px; line-height:1.2; }
+  .fg-br .br-row .bri { font-size:13px; }
+  .fg-br .br-row .brt { font-weight:500; }
+  .fg-br .br-row.fail { color:var(--red); }
+  .fg-br .br-row.pass { color:var(--green); }
+  .fg-br .br-row .loop { color:var(--orange); font-size:10px; margin-left:auto; display:flex; align-items:center; gap:2px; }
+  .fg-br .br-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.3px; font-weight:600; }
+  .fg-br .br-div { height:1px; background:var(--border); margin:2px 0; }
+
+  /* Legend */
+  .fg-legend { display:flex; gap:16px; margin-top:16px; flex-wrap:wrap; font-size:11px; color:var(--text2); }
+  .fg-legend span { display:flex; align-items:center; gap:4px; }
+  .fg-legend .sw { width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid var(--border); }
 </style>
 
 <script>
 (function(){
-  var row = document.getElementById('flowRow');
-  if (!row) return;
+  var grid = document.getElementById('flowGrid');
+  if (!grid) return;
 
-  function n(icon, title, meta, cls) {
-    return '<div class="fn '+(cls||'')+'"><div class="fn-row1"><span class="fn-icon">'+icon+'</span><span class="fn-title">'+title+'</span></div>'+(meta?'<div class="fn-meta">'+meta+'</div>':'')+'</div>';
+  function cell(icon, title, meta, cls) {
+    return '<div class="fg '+(cls||'')+'"><div class="fg-r1"><span class="fg-ic">'+icon+'</span><span class="fg-ti">'+title+'</span></div>'+(meta?'<div class="fg-me">'+meta+'</div>':'')+'</div>';
   }
-  function a() { return '<span class="fa">▸</span>'; }
-  function l() { return '<span class="fl"></span>'; }
-  function br(top, bot, tlab, blab) {
-    return '<span class="fb"><span class="fb-top">'+(tlab?'<span class="fbl">'+tlab+'</span>':'')+top+'</span><span class="fb-bot">'+(blab?'<span class="fbl">'+blab+'</span>':'')+bot+'</span></span>';
+  function arr() { return '<div class="fg-arr">▸</div>'; }
+  function arrD() { return '<div class="fg-arr-down">▼</div>'; }
+  function spacer() { return '<div style="width:calc(20% - 8px)"></div>'; }
+
+  function branch(topRow, botRow, tLabel, bLabel) {
+    return '<div class="fg-br">' +
+      (tLabel ? '<div class="br-label">'+tLabel+'</div>' : '') +
+      '<div class="br-row pass">'+topRow+'</div>' +
+      '<div class="br-div"></div>' +
+      (bLabel ? '<div class="br-label">'+bLabel+'</div>' : '') +
+      '<div class="br-row fail">'+botRow+'</div>' +
+    '</div>';
   }
 
-  var h = '';
-  h += n('📋','Get Accounts','Alibaba, Helium 10, JungleScout, Sellerboard','start')+a()+l();
-  h += n('🔍','Find Winning Product','Market research, keywords, competition')+a()+l();
-  h += n('🏢','Setup LLC','Legal entity for Amazon business')+a()+l();
-  h += n('🛒','Create Seller Account','Under your LLC')+a()+l();
-  h += n('🏦','Setup Bank Accounts','Business banking, clean accounting')+a()+l();
-  h += n('🔍','Find Winning Product','Validate margins, demand, fit')+a()+l();
-  h += n('📞','Contact 5-10 Suppliers','Reach out on Alibaba');
-  h += a()+l();
-  h += br(
-    n('❌','Bad Samples','Revise, retry','warn')+a()+'<span class="flo">↩ Contact</span>',
-    n('✅','Good Samples','Proceed with supplier','success'),
-    'SAMPLES FAIL','SAMPLES PASS'
-  );
-  h += a()+l();
-  h += n('📦','Order 3 Samples','Compare quality, pricing, lead time')+a()+l();
-  h += n('🏆','Best Seller Sample','Final sample from top supplier')+a()+l();
-  h += n('⚖️','Best Supplier','Quality vs. price decision')+a()+l();
-  h += n('✏️','Negotiate Changes','Product specs + custom packaging')+a()+l();
-  h += n('📊','Register Barcodes','UPC/EAN codes')+a()+l();
-  h += n('📄','Dummy Listing','Draft while waiting')+a()+l();
-  h += n('💰','30-50% Deposit','Secure production slot')+a()+l();
-  h += n('🔎','Product Inspection','Third-party QC (QIMA)','decision');
-  h += a()+l();
-  h += br(
-    n('⚠️','Major Issues?','Quality fails','warn')+a()+'<span class="flo">↩ Contact</span>',
-    n('✅','No Issues','Inspection passed','success'),
-    'FAILED','PASSED'
-  );
-  h += a()+l();
-  h += br(
-    n('📷','Listing Team','Photos & listing creation')+a()+l()+n('🔄','Revise Listing','2+ weeks while waiting'),
-    n('🚚','Shipping+FNSKUs','Set plan, manufacturer ships to Amazon')
-  );
-  h += a()+l();
-  h += n('⭐','FNF Reviews','Friends & Family early reviews')+a()+l();
-  h += n('®️','Brand Registry','Trademark + enroll')+a()+l();
-  h += n('🌿','Amazon Vine','Verified reviews program','success');
+  var items = [];
+  // Build all grid items in order
+  items.push({html: cell('📋','Get Accounts','Alibaba, Helium 10, JungleScout','start')});
+  items.push({html: cell('🔍','Find Winning Product','Market research, keywords')});
+  items.push({html: cell('🏢','Setup LLC','Legal entity for Amazon')});
+  items.push({html: cell('🛒','Create Seller Account','Under your LLC')});
+  items.push({html: cell('🏦','Setup Bank Accounts','Business banking' )});
 
-  row.innerHTML = h;
+  items.push({html: cell('🔍','Find Winning Product','Validate margins, demand')});
+  items.push({html: cell('📞','Contact 5-10 Suppliers','Reach out on Alibaba')});
+  items.push({html: branch(
+    '<span class="bri">✅</span><span class="brt">Good Samples</span>',
+    '<span class="bri">❌</span><span class="brt">Bad Samples</span><span class="loop">↩ Contact</span>',
+    'PASS', 'FAIL'
+  )});
+  items.push({html: cell('📦','Order 3 Samples','Compare quality, pricing')});
+  items.push({html: cell('🏆','Best Seller Sample','Final from top supplier')});
+
+  items.push({html: cell('⚖️','Best Supplier','Quality vs. price')});
+  items.push({html: cell('✏️','Negotiate Changes','Product + packaging')});
+  items.push({html: cell('📊','Register Barcodes','UPC/EAN codes')});
+  items.push({html: cell('📄','Dummy Listing','Draft while waiting')});
+  items.push({html: cell('💰','30-50% Deposit','Secure production slot')});
+
+  items.push({html: cell('🔎','Product Inspection','Third-party QC (QIMA)','decision')});
+  items.push({html: branch(
+    '<span class="bri">✅</span><span class="brt">No Issues</span>',
+    '<span class="bri">⚠️</span><span class="brt">Major Issues?</span><span class="loop">↩ Contact</span>',
+    'PASS', 'FAIL'
+  )});
+  items.push({html: branch(
+    '<span class="bri">📷</span><span class="brt">Listing Team</span><span class="fg-arr" style="font-size:10px">▸</span><span class="bri">🔄</span><span class="brt">Revise Listing</span>',
+    '<span class="bri">🚚</span><span class="brt">Shipping+FNSKUs</span>',
+    'LISTING PREP', 'SHIPPING'
+  )});
+  items.push({html: cell('⭐','FNF Reviews','Friends & Family')});
+  items.push({html: cell('®️','Brand Registry','Trademark + enroll')});
+
+  items.push({html: cell('🌿','Amazon Vine','Verified reviews program','success')});
+
+  // Render as grid: 5 per row with arrows between items and down arrows between rows
+  var html = '';
+  var perRow = 5;
+
+  for (var i = 0; i < items.length; i++) {
+    var col = i % perRow;
+
+    if (col === 0 && i > 0) {
+      // End previous row
+      html += '</div>';
+      // Add down arrow for next row
+      html += '<div style="width:100%;display:flex;justify-content:center;padding:4px 0">▼</div>';
+    }
+
+    if (col === 0) {
+      html += '<div style="display:flex;align-items:center;gap:6px;width:100%">';
+    }
+
+    // Add arrow before item (except first in row)
+    if (col > 0) {
+      html += '<div class="fg-arr">▸</div>';
+    }
+
+    html += items[i].html;
+  }
+  // Close last row
+  html += '</div>';
+
+  // Add legend
+  html += '<div class="fg-legend" style="margin-top:20px">' +
+    '<span><span class="sw" style="background:var(--accent)"></span> Start</span>' +
+    '<span><span class="sw" style="background:var(--green)"></span> Success</span>' +
+    '<span><span class="sw" style="background:var(--orange)"></span> Decision</span>' +
+    '<span><span class="sw" style="background:var(--red)"></span> Warning</span>' +
+    '<span><span class="sw" style="background:var(--surface);border-color:var(--border)"></span> Step</span>' +
+  '</div>';
+
+  grid.innerHTML = html;
 })();
 </script>
 
