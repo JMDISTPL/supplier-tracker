@@ -1,1 +1,0 @@
-uv pip install youtube-transcript-api pymupdf
