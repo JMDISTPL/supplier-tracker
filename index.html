@@ -515,6 +515,8 @@
 .niche-card.status-denied:hover { opacity: 1; }
 .niche-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .niche-header h3 { font-size: 15px; font-weight: 700; line-height: 1.3; }
+.niche-link { color: var(--accent); text-decoration: none; }
+.niche-link:hover { color: var(--accent-hover); text-decoration: underline; }
 .niche-category { font-size: 10px; color: var(--accent); background: var(--surface2); padding: 2px 8px; border-radius: 10px; white-space: nowrap; text-transform: uppercase; letter-spacing: .3px; }
 .niche-stats { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--text2); }
 .niche-stats span { white-space: nowrap; }
@@ -1014,7 +1016,7 @@ function renderNiches() {
         var pros = n.pros || [];
         var cons = n.cons || [];
         return '<div class="niche-card status-'+n.status+'">'+
-          '<div class="niche-header"><h3>'+escHtml(n.niche_name)+'</h3><span class="niche-category">'+(n.category||'')+'</span></div>'+
+          '<div class="niche-header"><h3>'+(n.source_url?'<a href="'+escA(n.source_url)+'" target="_blank" class="niche-link">'+escHtml(n.niche_name)+'</a>':escHtml(n.niche_name))+'</h3><span class="niche-category">'+(n.category||'')+'</span></div>'+
           '<div class="niche-stats">'+
             '<span>💰 '+(n.price_range||'')+'</span>'+
             '<span>📊 SV '+(n.monthly_sales_min?Math.round(n.monthly_sales_min/1000):'?')+'\u2013'+(n.monthly_sales_max?Math.round(n.monthly_sales_max/1000):'?')+'k</span>'+
