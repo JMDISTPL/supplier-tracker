@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modular Board — Final Design</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  h1 { font-size: 24px; margin-bottom: 4px; color: #fff; }
+  .subtitle { color: #999; margin-bottom: 24px; font-size: 14px; }
+
+  .board-wrap {
+    position: relative;
+    width: 800px;
+    height: 340px;
+    background: #2a2a2a;
+    border-radius: 16px;
+    padding: 20px 30px;
+    margin-bottom: 24px;
+  }
+
+  /* Center Square */
+  .center {
+    position: absolute;
+    top: 55px;
+    left: 285px;
+    width: 230px;
+    height: 230px;
+    background: linear-gradient(145deg, #8B6914, #A0782C 30%, #6B4F12 70%);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 2;
+  }
+
+  /* Left End — 6.5" deep */
+  .left-end {
+    position: absolute;
+    top: 55px;
+    left: 195px;
+    width: 95px;
+    height: 230px;
+    background: linear-gradient(145deg, #8B6914, #A0782C 30%, #6B4F12 70%);
+    border-radius: 130px 0 0 130px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+
+  /* Right End — 6.5" deep */
+  .right-end {
+    position: absolute;
+    top: 55px;
+    left: 510px;
+    width: 95px;
+    height: 230px;
+    background: linear-gradient(145deg, #8B6914, #A0782C 30%, #6B4F12 70%);
+    border-radius: 0 130px 130px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+
+  /* Magnet connection dots */
+  .mag { position: absolute; width: 10px; height: 10px; background: #555; border: 2px solid #888; border-radius: 50%; z-index: 5; }
+  .mag.l { top: 50%; left: -5px; margin-top: -5px; }
+  .mag.r { top: 50%; right: -5px; margin-top: -5px; }
+  .mag.l1 { top: 30%; left: -5px; }
+  .mag.l2 { top: 70%; left: -5px; }
+  .mag.r1 { top: 30%; right: -5px; }
+  .mag.r2 { top: 70%; right: -5px; }
+
+  /* Knife indented slots on flat edge of end pieces */
+  .knife-slot {
+    position: absolute;
+    width: 8px;
+    height: 55px;
+    background: #4a3a2a;
+    border-radius: 4px;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+    z-index: 3;
+  }
+  .knife-inner {
+    position: absolute;
+    width: 6px;
+    height: 40px;
+    background: #c0c0c0;
+    border-radius: 2px;
+    top: 8px;
+    left: 1px;
+  }
+  .knife-handle {
+    position: absolute;
+    width: 6px;
+    height: 18px;
+    background: #3a2a1a;
+    border-radius: 1px;
+    top: 30px;
+    left: 1px;
+  }
+  /* Left end knives (cheese knives) — on the right (flat) edge */
+  .ls1 { top: 30px; right: 14px; }
+  .ls2 { top: 145px; right: 14px; }
+
+  /* Right end knives (spreader knives) — on the left (flat) edge */
+  .rs1 { top: 30px; left: 14px; }
+  .rs2 { top: 145px; left: 14px; }
+
+  /* Bowls */
+  .bowl {
+    position: absolute;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #1a3a5c, #2a5a8c 50%, #1a3a5c);
+    border: 2px solid #3a6a9c;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 4;
+  }
+  .bowl-inner {
+    position: absolute; top: 7px; left: 7px; right: 7px; bottom: 7px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2a4a6c, #1a3048);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+  }
+  .b1 { top: 8px; left: 8px; }
+  .b2 { top: 92px; left: 5px; }
+  .b3 { bottom: 8px; left: 8px; }
+
+  /* Labels */
+  .lbl { position: absolute; font-size: 11px; color: #888; text-align: center; z-index: 10; }
+  .lbl-c { top: 298px; left: 285px; width: 230px; }
+  .lbl-l { top: 298px; left: 155px; width: 150px; }
+  .lbl-r { top: 298px; left: 495px; width: 150px; }
+  .lbl small { font-size: 10px; color: #666; }
+
+  /* Configurations */
+  .configs { display: flex; gap: 16px; justify-content: center; margin: 16px 0 24px; }
+  .cfg {
+    background: #2a2a2a; border-radius: 10px; padding: 12px 16px;
+    text-align: center; width: 130px;
+  }
+  .cfg .icon {
+    width: 60px; height: 40px; background: #8B6914; border-radius: 6px;
+    margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; gap: 3px;
+  }
+  .cfg .icon span { display: inline-block; width: 16px; height: 24px; background: #A0782C; border-radius: 3px; }
+  .cfg .name { font-size: 12px; color: #ccc; }
+  .cfg .note { font-size: 10px; color: #666; }
+
+  /* Box mockup */
+  .box {
+    background: #2a2a2a; border-radius: 12px; padding: 20px;
+    width: 440px; margin: 0 auto 24px;
+  }
+  .box h3 { font-size: 15px; margin-bottom: 12px; color: #fff; text-align: center; }
+  .box-inner {
+    position: relative; width: 400px; height: 200px;
+    background: #333; border: 2px solid #555; border-radius: 8px;
+    margin: 0 auto; padding: 10px;
+  }
+  .layer {
+    position: absolute; left: 10px; right: 10px; height: 80px;
+    border: 1px dashed #666; border-radius: 6px; padding: 8px 12px;
+    font-size: 11px; color: #888;
+  }
+  .layer.top { top: 10px; background: rgba(40,40,70,0.3); }
+  .layer.bot { top: 100px; background: rgba(50,40,30,0.3); }
+  .layer strong { color: #aaa; }
+
+  /* Legend */
+  .legend { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; font-size: 12px; color: #999; margin-top: 12px; }
+  .leg { display: flex; align-items: center; gap: 5px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  /* Specs */
+  .specs { display: flex; gap: 16px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .sp {
+    background: #2a2a2a; border-radius: 10px; padding: 12px 16px;
+    text-align: center; min-width: 110px;
+  }
+  .sp .v { font-size: 20px; font-weight: 700; color: #fff; }
+  .sp .l { font-size: 11px; color: #888; }
+
+  .disc { margin-top: 20px; font-size: 11px; color: #555; text-align: center; max-width: 500px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>🧲 Modular Magnetic Charcuterie Board</h1>
+<p class="subtitle">Final Design — $64.99</p>
+
+<h2 style="color:#fff;font-size:15px;margin-bottom:10px;">Top-Down View (Fully Extended — 26×13")</h2>
+<div class="board-wrap">
+
+  <div class="center"></div>
+
+  <!-- Left end -->
+  <div class="left-end">
+    <div class="mag r1"></div>
+    <div class="mag r2"></div>
+    <div class="bowl b1"><div class="bowl-inner"></div></div>
+    <div class="bowl b2"><div class="bowl-inner"></div></div>
+    <div class="bowl b3"><div class="bowl-inner"></div></div>
+    <div class="knife-slot ls1"><div class="knife-inner"></div><div class="knife-handle"></div></div>
+    <div class="knife-slot ls2"><div class="knife-inner"></div><div class="knife-handle"></div></div>
+  </div>
+  <div class="lbl lbl-l">Left End<br><small>3 bowls + 2 cheese knives (indented, magnetic)</small></div>
+
+  <!-- Right end -->
+  <div class="right-end">
+    <div class="mag l1"></div>
+    <div class="mag l2"></div>
+    <div class="bowl b1"><div class="bowl-inner"></div></div>
+    <div class="bowl b2"><div class="bowl-inner"></div></div>
+    <div class="bowl b3"><div class="bowl-inner"></div></div>
+    <div class="knife-slot rs1"><div class="knife-inner"></div><div class="knife-handle"></div></div>
+    <div class="knife-slot rs2"><div class="knife-inner"></div><div class="knife-handle"></div></div>
+  </div>
+  <div class="lbl lbl-r">Right End<br><small>3 bowls + 2 spreader knives (indented, magnetic)</small></div>
+
+  <div class="lbl lbl-c">Center Square 13×13"<br><small>Clean serving surface</small></div>
+
+</div>
+
+<h2 style="color:#fff;font-size:15px;margin-bottom:10px;">Configurations</h2>
+<div class="configs">
+  <div class="cfg">
+    <div class="icon"><span></span><span></span><span></span></div>
+    <div class="name">Long Board</div>
+    <div class="note">26×13" · Parties</div>
+  </div>
+  <div class="cfg">
+    <div class="icon" style="width:50px;height:50px;border-radius:50%;"><span style="width:30px;height:30px;border-radius:50%;"></span></div>
+    <div class="name">Circle</div>
+    <div class="note">Casual gathering</div>
+  </div>
+  <div class="cfg">
+    <div class="icon"><span style="width:24px;"></span><span style="width:24px;"></span></div>
+    <div class="name">Square</div>
+    <div class="note">13×13" · Compact</div>
+  </div>
+  <div class="cfg">
+    <div class="icon" style="border-radius:8px 8px 50% 50%;"><span style="height:28px;"></span><span style="height:28px;"></span></div>
+    <div class="name">Heart</div>
+    <div class="note">Date night</div>
+  </div>
+</div>
+
+<h2 style="color:#fff;font-size:15px;margin-bottom:10px;">Specs</h2>
+<div class="specs">
+  <div class="sp"><div class="v">3</div><div class="l">Magnetic Pieces</div></div>
+  <div class="sp"><div class="v">26×13"</div><div class="l">Fully Extended</div></div>
+  <div class="sp"><div class="v">~3.8 lbs</div><div class="l">DIM Weight</div></div>
+  <div class="sp"><div class="v">$64.99</div><div class="l">Sell Price</div></div>
+  <div class="sp"><div class="v">~$14</div><div class="l">COGS Target</div></div>
+</div>
+
+<h2 style="color:#fff;font-size:15px;margin-bottom:10px;">Unboxing</h2>
+<div class="box">
+  <div class="box-inner">
+    <div class="layer top">
+      <strong>Layer 1 — First Look</strong><br>
+      🧾 Care card + Recipe card · 🏷️ Leather brand tag<br>
+      🍶 6 ceramic bowls (3+3) in foam cutout
+    </div>
+    <div class="layer bot">
+      <strong>Layer 2 — The Reveal</strong><br>
+      🪵 3 board pieces nested flat<br>
+      🔪 4 knives in foam slots (2 cheese + 2 spreader)<br>
+      📦 Box: ~13.5×16×3"
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg"><span class="sw" style="background:linear-gradient(145deg,#8B6914,#A0782C);"></span> Stained Acacia (walnut finish)</div>
+  <div class="leg"><span class="sw" style="background:linear-gradient(135deg,#1a3a5c,#2a5a8c);"></span> Magnetic inset navy ceramic bowls</div>
+  <div class="leg"><span class="sw" style="background:#555;border:2px solid #888;"></span> Neodymium magnets</div>
+  <div class="leg"><span class="sw" style="background:#4a3a2a;"></span> Indented magnetic knife slots</div>
+</div>
+
+<div class="disc">⚠️ Design mockup — colors, proportions, and details are approximate.<br>Board shown in Long configuration. Pieces nest for storage.</div>
+
+</body>
+</html>

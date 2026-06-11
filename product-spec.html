@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Spec — Modular Charcuterie Board</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1117;
+    color: #e4e6f0;
+    padding: 40px;
+    line-height: 1.6;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 28px; color: #fff; margin-bottom: 4px; }
+  .subtitle { color: #9498b0; font-size: 14px; margin-bottom: 32px; }
+  h2 { font-size: 18px; color: #fff; margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 1px solid #2e3348; }
+  h3 { font-size: 15px; color: #e4e6f0; margin: 20px 0 8px; }
+
+  .card {
+    background: #1a1d27;
+    border: 1px solid #2e3348;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 14px; color: #9498b0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #2e3348; font-size: 13px; }
+  th { color: #9498b0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td:last-child, th:last-child { text-align: right; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  .stat {
+    background: #1a1d27;
+    border: 1px solid #2e3348;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat .val { font-size: 26px; font-weight: 700; color: #fff; }
+  .stat .lbl { font-size: 11px; color: #9498b0; margin-top: 2px; }
+  .stat .green { color: #22c55e; }
+  .stat .yellow { color: #eab308; }
+  .stat .red { color: #ef4444; }
+
+  .layout-box {
+    background: #1a1d27;
+    border: 1px solid #2e3348;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #e4e6f0;
+    margin: 12px 0;
+  }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+  .tag-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .tag-yellow { background: rgba(234,179,8,0.15); color: #eab308; }
+  .tag-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+  @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🧲 Modular Magnetic Charcuterie Board</h1>
+<p class="subtitle">Product Specification Document — JMPL Logistics</p>
+
+<!-- Key Stats -->
+<div class="grid-3">
+  <div class="stat"><div class="val">$64.99</div><div class="lbl">Target Sell Price</div></div>
+  <div class="stat"><div class="val yellow">~34%</div><div class="lbl">Est. Margin at Launch</div></div>
+  <div class="stat"><div class="val">~$14-15</div><div class="lbl">Target COGS (300 pcs)</div></div>
+</div>
+
+<!-- Layout -->
+<h2>Layout</h2>
+<div class="card">
+  <div class="card-title">Assembled Configuration (Top-Down View)</div>
+  <div class="layout-box">
+┌──────────────────────────────────────────────────────┐<br>
+│                                                        │<br>
+│  🟫    ═══════                  ═══════   🟫          │<br>
+│  Bowl   Cracker                 Cracker  Serving 🫒    │<br>
+│  🟫    ═══════    Center        ═══════  🟫          │<br>
+│  Bowl   Groove     Square       Groove   Serving 🌰   │<br>
+│  🟫    ═══════   16×13"        ═══════  🟫          │<br>
+│  Bowl                           Serving 🥜           │<br>
+│                                                        │<br>
+│  ← Left End 6.5×13"       Right End 6.5×13" →       │<br>
+│    3 square white bowls      No bowls                 │<br>
+│    + cracker groove          + cracker groove          │<br>
+│                               + 2 serving grooves     │<br>
+└──────────────────────────────────────────────────────┘<br>
+  </div>
+</div>
+
+<!-- Dimensions -->
+<h2>Dimensions</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">Individual Pieces</div>
+    <table>
+      <tr><th>Piece</th><th>Dimensions</th><th>Shape</th></tr>
+      <tr><td>Center Square</td><td>16 × 13 × 0.75"</td><td>Rectangle</td></tr>
+      <tr><td>Left End Piece</td><td>6.5 × 13 × 0.75"</td><td>Rectangle</td></tr>
+      <tr><td>Right End Piece</td><td>6.5 × 13 × 0.75"</td><td>Rectangle</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">Box & Weight</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Box External</td><td>16.5 × 13.5 × 3"</td></tr>
+      <tr><td>DIM Weight</td><td>~4.8 lbs</td></tr>
+      <tr><td>Actual Weight</td><td>~7.1 lbs</td></tr>
+      <tr><td>FBA Fee Tier</td><td>~$9.00 (7 lb tier)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Materials -->
+<h2>Materials & Finishes</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">Wood</div>
+    <table>
+      <tr><td>Type</td><td>Acacia (solid wood)</td></tr>
+      <tr><td>Thickness</td><td>0.75"</td></tr>
+      <tr><td>Finish</td><td>Walnut stain + food-safe clear seal</td></tr>
+      <tr><td>Top coating</td><td>Gloss or satin clear, food-safe</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">Ceramic Bowls (Left End Only)</div>
+    <table>
+      <tr><td>Quantity</td><td>3 square bowls</td></tr>
+      <tr><td>Color</td><td>Standard white ceramic (no custom color)</td></tr>
+      <tr><td>Attachment</td><td>Sits in routed recess — not magnetic, not flush</td></tr>
+      <tr><td>Bowl recess depth</td><td>~0.4" (bowl sits ~50% above wood)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Routing -->
+<h2>Routing & Grooves</h2>
+<div class="card">
+  <table>
+    <tr><th>Feature</th><th>Location</th><th>Description</th></tr>
+    <tr><td>Cracker groove</td><td>Both end pieces (inner flat edge)</td><td>Continuous routed channel ~0.5" deep, 1" wide, full 13" length</td></tr>
+    <tr><td>Serving grooves (×2)</td><td>Right end piece (outer edge)</td><td>2 routed wells ~0.5" deep, 2.5" wide, for dry snacks (olives, nuts)</td></tr>
+    <tr><td>Bowl recesses (×3)</td><td>Left end piece (outer edge)</td><td>Circular/square recesses ~0.4" deep matching bowl base</td></tr>
+    <tr><td>Magnet holes (×8)</td><td>All connection edges</td><td>Small drilled holes for neodymium magnets, sealed with wood filler</td></tr>
+  </table>
+</div>
+
+<!-- Magnets -->
+<h2>Magnetic Connection System</h2>
+<div class="card">
+  <table>
+    <tr><th>Detail</th><th>Spec</th></tr>
+    <tr><td>Total magnets</td><td>8 neodymium (4 connection edges × 2 magnets each)</td></tr>
+    <tr><td>Connections</td><td>Left End ↔ Center ↔ Right End (2 edges per connection)</td></tr>
+    <tr><td>Placement</td><td>Recessed into drilled holes, sealed with wood filler on back side</td></tr>
+    <tr><td>Strength</td><td>N52 neodymium, enough to hold pieces together when carrying</td></tr>
+  </table>
+</div>
+
+<!-- Components -->
+<h2>Components Per Unit</h2>
+<div class="card">
+  <table>
+    <tr><th>Component</th><th>Qty</th><th>Unit Cost (300pcs)</th><th>Subtotal</th></tr>
+    <tr><td>Acacia center board (16×13×0.75")</td><td>1</td><td>$3.00-4.00</td><td>$3.00-4.00</td></tr>
+    <tr><td>Acacia end piece L (6.5×13×0.75")</td><td>1</td><td>$1.75-2.25</td><td>$1.75-2.25</td></tr>
+    <tr><td>Acacia end piece R (6.5×13×0.75")</td><td>1</td><td>$1.75-2.25</td><td>$1.75-2.25</td></tr>
+    <tr><td>Walnut stain + clear seal (all 3)</td><td>1</td><td>$1.00-1.50</td><td>$1.00-1.50</td></tr>
+    <tr><td>Routing (grooves + bowls + magnets)</td><td>1</td><td>$0.80-1.00</td><td>$0.80-1.00</td></tr>
+    <tr><td>Standard white square ceramic bowls</td><td>3</td><td>$0.30-0.50</td><td>$0.90-1.50</td></tr>
+    <tr><td>Basic cheese knife set (4 pcs)</td><td>1</td><td>$0.50-0.70</td><td>$0.50-0.70</td></tr>
+    <tr><td>Neodymium magnets</td><td>8</td><td>$0.10</td><td>$0.80-1.00</td></tr>
+    <tr><td>Custom printed box + foam insert</td><td>1</td><td>$2.50-4.00</td><td>$2.50-4.00</td></tr>
+    <tr><td>Care card + recipe card</td><td>1</td><td>$0.15-0.25</td><td>$0.15-0.25</td></tr>
+    <tr><td>Assembly labor</td><td>1</td><td>$0.50-1.00</td><td>$0.50-1.00</td></tr>
+    <tr style="border-top:2px solid #6366f1;"><td><strong>Total COGS per unit</strong></td><td></td><td></td><td><strong>$14-17</strong></td></tr>
+  </table>
+</div>
+
+<!-- Margin -->
+<h2>Margin Estimate</h2>
+<div class="card">
+  <table>
+    <tr><th>Item</th><th>At $59.99</th><th>At $64.99</th><th>At $69.99</th></tr>
+    <tr><td>Sell Price</td><td>$59.99</td><td>$64.99</td><td>$69.99</td></tr>
+    <tr><td>COGS (~$15)</td><td>-$15.00</td><td>-$15.00</td><td>-$15.00</td></tr>
+    <tr><td>FBA Fee (~7 lbs)</td><td>-$9.00</td><td>-$9.00</td><td>-$9.00</td></tr>
+    <tr><td>Referral Fee (15%)</td><td>-$9.00</td><td>-$9.75</td><td>-$10.50</td></tr>
+    <tr><td>Ad Spend (10%)</td><td>-$6.00</td><td>-$6.50</td><td>-$7.00</td></tr>
+    <tr><td>Returns (5%)</td><td>-$3.00</td><td>-$3.25</td><td>-$3.50</td></tr>
+    <tr style="border-top:2px solid #6366f1;"><td><strong>Net Profit</strong></td><td><strong>$17.99</strong></td><td><strong>$21.49</strong></td><td><strong>$24.99</strong></td></tr>
+    <tr><td><strong>Margin</strong></td><td><strong class="tag tag-yellow">~30%</strong></td><td><strong class="tag tag-yellow">~33%</strong></td><td><strong class="tag tag-green">~36%</strong></td></tr>
+  </table>
+</div>
+
+<!-- Unboxing -->
+<h2>Unboxing Layout</h2>
+<div class="card">
+  <div class="card-title">Box Internal (16.5 × 13.5 × 3")</div>
+  <div class="layout-box">
+┌─────────────────────────────────┐<br>
+│  Layer 1 — Top                  │<br>
+│  ┌───────────┬───────────┐     │<br>
+│  │ End Piece │ End Piece │     │  ← Side by side (13×13" footprint)<br>
+│  │   (Left)  │  (Right)  │     │<br>
+│  ├───────────┴───────────┤     │<br>
+│  │ Foam tray: 3 bowls +  │     │<br>
+│  │ 4 knives + cards      │     │<br>
+│  └───────────────────────┘     │<br>
+│  ───────────────────────────  │<br>
+│  Layer 2 — Bottom              │<br>
+│  ═══════════════════════════  │  ← Center board 16×13×0.75"<br>
+│  ═══════════════════════════  │<br>
+└─────────────────────────────────┘<br>
+  </div>
+</div>
+
+<!-- Sourcing Notes -->
+<h2>Sourcing Notes</h2>
+<div class="card">
+  <ul style="list-style: none; font-size: 14px;">
+    <li style="padding: 6px 0;">• <strong>Wood:</strong> Acacia, kiln-dried, no knots/cracks. Walnut stain + food-safe seal.</li>
+    <li style="padding: 6px 0;">• <strong>Routing:</strong> One continuous cracker groove per end. Two serving wells on right end. Three bowl recesses on left end.</li>
+    <li style="padding: 6px 0;">• <strong>Magnets:</strong> 8 N52 neodymium. 2 per connection edge. Drilled + sealed.</li>
+    <li style="padding: 6px 0;">• <strong>Bowls:</strong> Standard square white ceramic. Any standard 2.5-3" bowl works. No custom color.</li>
+    <li style="padding: 6px 0;">• <strong>Knives:</strong> Basic 4-piece cheese knife set. Any variety pack. No custom order needed.</li>
+    <li style="padding: 6px 0;">• <strong>Box:</strong> Full-color printed lid, plain base. Foam insert with cutouts for all pieces.</li>
+    <li style="padding: 6px 0;">• <strong>Sample rounds:</strong> 1st sample = board + magnet fit only. 2nd sample = final product + packaging.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
