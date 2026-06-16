@@ -450,8 +450,8 @@
   /* Done state */
   .fl-item.done { background:var(--green); border-color:var(--green); }
   .fl-item.done:hover { background:#16a34a; }
-  .fl-item.done .fl-num { background:rgba(255,255,255,.2); color:white; }
-  .fl-item.done .fl-icon { filter:brightness(10); }
+  .fl-item.done .fl-num { background:var(--green); color:white; font-size:14px; }
+    .fl-item.done .fl-icon { filter:brightness(10); }
   .fl-item.done .fl-title { color:white; }
   .fl-item.done .fl-meta { color:rgba(255,255,255,.75); }
   .fl-item.done .fl-check { background:white; border-color:white; }
@@ -515,10 +515,10 @@
     steps.forEach(function(s, i) {
       var cls = done[i] ? 'fl-item done' : 'fl-item';
       html += '<div class="'+cls+'" onclick="flip('+i+')">' +
-        '<div class="fl-num">'+(i+1)+'</div>' +
-        '<span class="fl-icon">'+s.icon+'</span>' +
-        '<div class="fl-body"><div class="fl-title">'+s.title+'</div><div class="fl-meta">'+s.meta+'</div></div>' +
-        '<div class="fl-check"></div></div>';
+            '<div class="fl-num">'+(done[i]?'✓':(i+1))+'</div>' +
+            '<span class="fl-icon">'+s.icon+'</span>' +
+            '<div class="fl-body"><div class="fl-title">'+s.title+'</div><div class="fl-meta">'+s.meta+'</div></div>' +
+            '<div class="fl-check"></div></div>';
     });
 
     html += '<div class="fl-legend"><span>💡 Click to toggle complete</span></div>';
