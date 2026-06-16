@@ -419,280 +419,121 @@
 
 <!-- FLOW PAGE -->
 <div id="page-flow" class="page" style="padding:0;overflow:hidden">
-  <div style="flex:1;overflow-y:auto;padding:20px 24px" id="flowContainer">
+  <div style="flex:1;overflow-y:auto;padding:24px 32px" id="flowContainer">
     <h2 style="font-size:20px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px">🗺️ Private Label Flow</h2>
-    <p style="color:var(--text2);font-size:13px;margin-bottom:16px">End-to-end Amazon Private Label workflow</p>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start" id="flowGrid"></div>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:20px">Click each step to mark it complete</p>
+    <div id="flowList" style="max-width:700px"></div>
   </div>
 </div>
 
 <style>
-  .fg {
-      display:flex; flex-direction:column;
-      background:var(--surface); border:1px solid var(--border); border-radius:10px;
-      padding:10px 12px; cursor:pointer; transition:border-color .15s, box-shadow .15s, background .2s;
-      width:calc(20% - 8px); min-width:0; box-sizing:border-box; position:relative;
-    }
-    .fg:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
-    .fg .fg-r1 { display:flex; align-items:center; gap:6px; }
-    .fg .fg-ic { font-size:16px; }
-    .fg .fg-ti { font-size:13px; font-weight:600; line-height:1.3; }
-    .fg .fg-me { font-size:10px; color:var(--text2); margin-top:2px; line-height:1.3; }
-    .fg.start { border-color:var(--accent); }
-    .fg.decision { border-color:var(--orange); }
-    .fg.success { border-color:var(--green); }
-    .fg.warn { border-color:var(--red); }
-    /* Completed state */
-    .fg.done { background:var(--green); border-color:var(--green); }
-    .fg.done:hover { background:#16a34a; border-color:#16a34a; }
-    .fg.done .fg-ti { color:white; }
-    .fg.done .fg-me { color:rgba(255,255,255,.8); }
-    .fg.done .fg-ic { filter:brightness(10); }
-    .fg.done::after {
-      content:'✓'; position:absolute; top:4px; right:7px;
-      color:white; font-size:16px; font-weight:700; line-height:1;
-    }
-
-  .fg-arr {
-    display:flex; align-items:center; justify-content:center;
-    color:var(--text2); font-size:14px; flex-shrink:0;
+  .fl-item {
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; cursor:pointer; transition:all .2s; margin-bottom:6px;
   }
-  .fg-arr-down {
+  .fl-item:hover { border-color:var(--accent); }
+  .fl-item .fl-num {
+    width:28px; height:28px; border-radius:50%; background:var(--surface2);
     display:flex; align-items:center; justify-content:center;
-    color:var(--text2); font-size:14px; width:100%; padding:2px 0;
+    font-size:13px; font-weight:700; color:var(--text2); flex-shrink:0; transition:all .2s;
+  }
+  .fl-item .fl-icon { font-size:18px; flex-shrink:0; }
+  .fl-item .fl-body { flex:1; }
+  .fl-item .fl-title { font-size:14px; font-weight:600; line-height:1.3; }
+  .fl-item .fl-meta { font-size:11px; color:var(--text2); margin-top:1px; }
+  .fl-item .fl-check {
+    width:22px; height:22px; border-radius:6px; border:2px solid var(--border);
+    flex-shrink:0; transition:all .2s; display:flex; align-items:center; justify-content:center;
   }
 
-  /* Branch card - stacks two paths vertically */
-  .fg-br {
-      display:flex; flex-direction:column; gap:4px;
-      background:var(--surface); border:1px solid var(--border); border-radius:10px;
-      padding:6px 10px; cursor:pointer; transition:border-color .15s, background .2s;
-      width:calc(20% - 8px); min-width:0; box-sizing:border-box; position:relative;
-    }
-    .fg-br:hover { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
-    .fg-br .br-row { display:flex; align-items:center; gap:4px; font-size:12px; line-height:1.2; }
-    .fg-br .br-row .bri { font-size:13px; }
-    .fg-br .br-row .brt { font-weight:500; }
-    .fg-br .br-row.fail { color:var(--red); }
-    .fg-br .br-row.pass { color:var(--green); }
-    .fg-br .br-row .loop { color:var(--orange); font-size:10px; margin-left:auto; display:flex; align-items:center; gap:2px; }
-    .fg-br .br-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:.3px; font-weight:600; }
-    .fg-br .br-div { height:1px; background:var(--border); margin:2px 0; }
-    /* Branch completed state */
-    .fg-br.done { background:var(--green); border-color:var(--green); }
-    .fg-br.done:hover { background:#16a34a; border-color:#16a34a; }
-    .fg-br.done .br-row, .fg-br.done .br-label, .fg-br.done .loop { color:white; }
-    .fg-br.done .br-div { background:rgba(255,255,255,.3); }
-    .fg-br.done .bri { filter:brightness(10); }
-    .fg-br.done::after {
-      content:'✓'; position:absolute; top:4px; right:7px;
-      color:white; font-size:14px; font-weight:700; line-height:1;
-    }
+  /* Done state */
+  .fl-item.done { background:var(--green); border-color:var(--green); }
+  .fl-item.done:hover { background:#16a34a; }
+  .fl-item.done .fl-num { background:rgba(255,255,255,.2); color:white; }
+  .fl-item.done .fl-icon { filter:brightness(10); }
+  .fl-item.done .fl-title { color:white; }
+  .fl-item.done .fl-meta { color:rgba(255,255,255,.75); }
+  .fl-item.done .fl-check { background:white; border-color:white; }
+  .fl-item.done .fl-check::after { content:'\u2713'; color:var(--green); font-size:16px; font-weight:700; }
 
-  /* Legend */
-  .fg-legend { display:flex; gap:16px; margin-top:16px; flex-wrap:wrap; font-size:11px; color:var(--text2); }
-  .fg-legend span { display:flex; align-items:center; gap:4px; }
-  .fg-legend .sw { width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid var(--border); }
+  /* Progress bar */
+  .fl-progress { margin-bottom:20px; display:flex; align-items:center; gap:14px; }
+  .fl-progress .fl-pbar {
+    flex:1; height:8px; background:var(--surface2); border-radius:4px; overflow:hidden;
+  }
+  .fl-progress .fl-pfill {
+    height:100%; background:var(--green); border-radius:4px; transition:width .3s;
+  }
+  .fl-progress .fl-plbl { font-size:13px; color:var(--text2); white-space:nowrap; font-weight:500; }
+
+  .fl-legend { display:flex; gap:12px; flex-wrap:wrap; font-size:11px; color:var(--text2); margin-top:6px; }
 </style>
-
-<style>
-/* ===== SOURCING PAGE ===== */
-.sourcing-header { padding: 16px 24px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.sourcing-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.sourcing-title-row h2 { font-size: 18px; font-weight: 600; }
-.sourcing-subtitle { font-size: 11px; color: var(--text2); }
-.sourcing-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-.source-tab { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text2); transition: all .15s; }
-.source-tab:hover { border-color: var(--accent); color: var(--text); }
-.source-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
-.source-tab.archive-tab { margin-left: auto; border-color: var(--orange); color: var(--orange); }
-.source-tab.archive-tab:hover { background: var(--orange); color: white; }
-.source-tab.archive-tab.active { background: var(--orange); color: white; }
-.sourcing-body { flex: 1; overflow: hidden; display: flex; }
-.niche-grid { flex: 1; overflow-y: auto; padding: 16px 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; align-content: start; }
-.niche-empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text2); }
-.niche-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; transition: all .2s; position: relative; display: flex; flex-direction: column; gap: 10px; }
-.niche-card:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(99,102,241,.1); }
-.niche-card.status-approved { border-left: 4px solid var(--green); }
-.niche-card.status-denied { border-left: 4px solid var(--red); opacity: .7; }
-.niche-card.status-denied:hover { opacity: 1; }
-.niche-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-.niche-header h3 { font-size: 15px; font-weight: 700; line-height: 1.3; }
-.niche-link { color: var(--accent); text-decoration: none; }
-.niche-link:hover { color: var(--accent-hover); text-decoration: underline; }
-.niche-category { font-size: 10px; color: var(--accent); background: var(--surface2); padding: 2px 8px; border-radius: 10px; white-space: nowrap; text-transform: uppercase; letter-spacing: .3px; }
-.niche-stats { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--text2); }
-.niche-stats span { white-space: nowrap; }
-.niche-checklists { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.niche-checklists ul { list-style: none; padding: 0; margin: 0; font-size: 11px; line-height: 1.6; }
-.niche-checklists .pros-list { color: var(--green); }
-.niche-checklists .cons-list { color: var(--red); }
-.niche-checklists .pros-list li, .niche-checklists .cons-list li { padding: 2px 0; }
-.niche-actions { display: flex; gap: 8px; margin-top: 4px; justify-content: center; }
-.btn-approve { background: var(--green); color: white; border: none; }
-.btn-approve:hover { background: #16a34a; }
-.btn-deny { background: var(--red); color: white; border: none; }
-.btn-deny:hover { background: #dc2626; }
-.niche-status-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; display: inline-block; }
-.niche-status-badge.approved { background: rgba(34,197,94,.15); color: var(--green); }
-.niche-status-badge.denied { background: rgba(239,68,68,.15); color: var(--red); }
-.niche-denial-note { font-size: 11px; color: var(--text2); margin-top: 4px; padding: 6px 8px; background: var(--surface2); border-radius: 6px; }
-.improve-section { margin-top: 10px; padding: 8px 10px; background: rgba(99,102,241,.08); border-radius: 8px; border: 1px solid rgba(99,102,241,.2); }
-.improve-section h4 { font-size: 12px; margin-bottom: 6px; color: var(--accent); }
-.improve-list { list-style: none; padding: 0; margin: 0; }
-.improve-list li { font-size: 12px; color: var(--text2); padding: 3px 0; line-height: 1.5; }
-.niche-denial-note strong { color: var(--red); }
-.archive-panel { width: 340px; flex-shrink: 0; background: var(--surface); border-left: 1px solid var(--border); overflow-y: auto; padding: 16px; }
-.archive-panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.archive-sub { font-size: 10px; color: var(--text2); font-weight: 400; }
-.archive-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 12px; }
-.archive-item .arch-name { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-.archive-item .arch-reason { color: var(--red); font-size: 11px; margin-bottom: 4px; }
-.archive-item .arch-meta { color: var(--text2); font-size: 10px; }
-.archive-item .arch-pros { color: var(--green); font-size: 10px; }
-.archive-item .arch-cons { color: var(--red); font-size: 10px; }
-.archive-empty { text-align: center; padding: 40px 10px; color: var(--text2); font-size: 13px; }
-@media (max-width: 768px) { .niche-grid { grid-template-columns: 1fr; padding: 12px; } .niche-checklists { grid-template-columns: 1fr; } .archive-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); max-height: 300px; } .sourcing-body { flex-direction: column; } }
-</style>
-
-<!-- ===== SOURCING PAGE ===== -->
-<div id="page-sourcing" class="page">
-  <div class="sourcing-header">
-    <div class="sourcing-title-row">
-      <h2>🔍 Product Sourcing</h2>
-      <span class="sourcing-subtitle">Research → Approve → Deny → Learn</span>
-    </div>
-    <div class="sourcing-tabs" id="sourcingTabs">
-      <button class="source-tab active" data-status="pending" onclick="setNicheFilter('pending')">📋 Pending</button>
-      <button class="source-tab" data-status="approved" onclick="setNicheFilter('approved')">✅ Approved</button>
-      <button class="source-tab" data-status="denied" onclick="setNicheFilter('denied')">❌ Denied</button>
-      <button class="source-tab" data-status="all" onclick="setNicheFilter('all')">📁 All</button>
-      <button class="source-tab archive-tab" onclick="toggleArchive()">📦 Archive</button>
-    </div>
-  </div>
-  <div class="sourcing-body">
-    <div class="niche-grid" id="nicheGrid">
-      <div class="loading"><div class="spinner"></div><div>Loading niches...</div></div>
-    </div>
-    <!-- Archive panel -->
-    <div class="archive-panel" id="archivePanel" style="display:none">
-      <h3>📦 Denial Archive <span class="archive-sub">(my learning memory)</span></h3>
-      <div id="archiveList">
-        <div class="loading"><div class="spinner"></div><div>Loading archive...</div></div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 (function(){
-  var grid = document.getElementById('flowGrid');
-  if (!grid) return;
-  var FLOW_KEY = 'jmpl_flow_done';
+  var list = document.getElementById('flowList');
+  if (!list) return;
+  var KEY = 'jmpl_flow_done';
 
-  function cell(icon, title, meta, cls) {
-    return '<div class="fg '+(cls||'')+'"><div class="fg-r1"><span class="fg-ic">'+icon+'</span><span class="fg-ti">'+title+'</span></div>'+(meta?'<div class="fg-me">'+meta+'</div>':'')+'</div>';
-  }
-
-  function branch(topRow, botRow, tLabel, bLabel) {
-    return '<div class="fg-br">' +
-      (tLabel ? '<div class="br-label">'+tLabel+'</div>' : '') +
-      '<div class="br-row pass">'+topRow+'</div>' +
-      '<div class="br-div"></div>' +
-      (bLabel ? '<div class="br-label">'+bLabel+'</div>' : '') +
-      '<div class="br-row fail">'+botRow+'</div>' +
-    '</div>';
-  }
-
-  var items = [
-    cell('📋','Get Accounts','Alibaba, Helium 10, JungleScout','start'),
-    cell('🔍','Find Winning Product','Market research, keywords'),
-    cell('🏢','Setup LLC','Legal entity for Amazon'),
-    cell('🛒','Create Seller Account','Under your LLC'),
-    cell('🏦','Setup Bank Accounts','Business banking'),
-
-    cell('🔍','Find Winning Product','Validate margins, demand'),
-    cell('📞','Contact 5-10 Suppliers','Reach out on Alibaba'),
-    branch('✅ Good Samples','❌ Bad Samples ↩ Contact','PASS','FAIL'),
-    cell('📦','Order 3 Samples','Compare quality, pricing'),
-    cell('🏆','Best Seller Sample','Final from top supplier'),
-
-    cell('⚖️','Best Supplier','Quality vs. price'),
-    cell('✏️','Negotiate Changes','Product + packaging'),
-    cell('📊','Register Barcodes','UPC/EAN codes'),
-    cell('📄','Dummy Listing','Draft while waiting'),
-    cell('💰','30-50% Deposit','Secure production slot'),
-
-    cell('🔎','Product Inspection','Third-party QC (QIMA)','decision'),
-    branch('✅ No Issues','⚠️ Major Issues? ↩ Contact','PASS','FAIL'),
-    branch('📷 Listing → 🔄 Revise','🚚 Shipping+FNSKUs','LISTING PREP','SHIPPING'),
-    cell('⭐','FNF Reviews','Friends & Family'),
-    cell('®️','Brand Registry','Trademark + enroll'),
-
-    cell('🌿','Amazon Vine','Verified reviews program','success')
+  var steps = [
+    {icon:'📋', title:'Acquire Accounts', meta:'Alibaba, Helium 10, JungleScout, Sellerboard'},
+    {icon:'🔍', title:'Find Winning Product', meta:'Market research, keywords, competition'},
+    {icon:'🏢', title:'Setup LLC', meta:'Legal entity for your Amazon business'},
+    {icon:'🛒', title:'Create Seller Account', meta:'Register under your LLC'},
+    {icon:'🏦', title:'Setup Business Bank Accounts', meta:'Separate banking for clean accounting'},
+    {icon:'🔍', title:'Find Winning Product', meta:'Validate margins, demand, and product fit'},
+    {icon:'📞', title:'Contact 5-10 Suppliers', meta:'Reach out on Alibaba, evaluate responses'},
+    {icon:'📦', title:'Order Samples from 3 Manufacturers', meta:'Compare quality, pricing, lead times'},
+    {icon:'🏆', title:'Order Sample from Best Seller', meta:'Final sample from top-performing supplier'},
+    {icon:'⚖️', title:'Find Best Fit Supplier', meta:'Make quality vs. price decision'},
+    {icon:'✏️', title:'Negotiate Changes & Packaging', meta:'Product specs + custom packaging'},
+    {icon:'📊', title:'Register Barcodes', meta:'UPC/EAN codes for Amazon listing'},
+    {icon:'📄', title:'Create Dummy Listing', meta:'Draft listing while waiting for product'},
+    {icon:'💰', title:'30-50% Deposit', meta:'Secure production slot with supplier'},
+    {icon:'🔎', title:'Schedule Product Inspection', meta:'Third-party QC (QIMA or similar)'},
+    {icon:'📷', title:'Send to Listing Team', meta:'Product photos & listing creation'},
+    {icon:'🔄', title:'Revise Listing', meta:'Polish listing while product ships (2+ weeks)'},
+    {icon:'🚚', title:'Set Up Shipping Plan & FNSKUs', meta:'Manufacturer ships to Amazon'},
+    {icon:'⭐', title:'Get FNF Reviews', meta:'Friends & Family early reviews'},
+    {icon:'®️', title:'Trademark & Brand Registry', meta:'Protect brand, submit to Amazon'},
+    {icon:'🌿', title:'Enroll in Amazon Vine', meta:'Get verified reviews program'}
   ];
 
   // Load saved state
   var done = {};
-  try { done = JSON.parse(localStorage.getItem(FLOW_KEY)) || {}; } catch(e) {}
+  try { done = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) {}
 
-  var html = '';
-  var perRow = 5;
+  function render() {
+    var total = steps.length;
+    var completed = 0;
+    steps.forEach(function(s, i) { if (done[i]) completed++; });
+    var pct = Math.round((completed/total)*100);
 
-  function toggle(i) {
+    var html = '<div class="fl-progress"><div class="fl-pbar"><div class="fl-pfill" style="width:'+pct+'%"></div></div><span class="fl-plbl">'+completed+'/'+total+' ('+pct+'%)</span></div>';
+
+    steps.forEach(function(s, i) {
+      var cls = done[i] ? 'fl-item done' : 'fl-item';
+      html += '<div class="'+cls+'" onclick="flip('+i+')">' +
+        '<div class="fl-num">'+(i+1)+'</div>' +
+        '<span class="fl-icon">'+s.icon+'</span>' +
+        '<div class="fl-body"><div class="fl-title">'+s.title+'</div><div class="fl-meta">'+s.meta+'</div></div>' +
+        '<div class="fl-check"></div></div>';
+    });
+
+    html += '<div class="fl-legend"><span>💡 Click to toggle complete</span></div>';
+    list.innerHTML = html;
+  }
+
+  window.flip = function(i) {
     done[i] = !done[i];
-    localStorage.setItem(FLOW_KEY, JSON.stringify(done));
-    var els = grid.querySelectorAll('.fg, .fg-br');
-    if (els[i]) {
-      els[i].classList.toggle('done', done[i]);
-    }
-  }
+    localStorage.setItem(KEY, JSON.stringify(done));
+    render();
+  };
 
-  for (var i = 0; i < items.length; i++) {
-    var col = i % perRow;
-
-    if (col === 0 && i > 0) {
-      html += '</div>';
-      html += '<div style="width:100%;display:flex;justify-content:center;padding:4px 0">▼</div>';
-    }
-    if (col === 0) {
-      html += '<div style="display:flex;align-items:center;gap:6px;width:100%">';
-    }
-    if (col > 0) {
-      html += '<div class="fg-arr">▸</div>';
-    }
-
-    // Add onclick and done class
-    var itemHtml = items[i];
-    var cls = done[i] ? ' done' : '';
-    var isBranch = itemHtml.indexOf('fg-br') >= 0;
-    if (isBranch) {
-      itemHtml = itemHtml.replace('class="fg-br', 'class="fg-br' + cls);
-    } else {
-      itemHtml = itemHtml.replace('class="fg', 'class="fg' + cls);
-    }
-    // Add onclick
-    itemHtml = itemHtml.replace('<div', '<div onclick="flowClick('+i+')"');
-
-    html += itemHtml;
-  }
-  html += '</div>';
-
-  // Add legend
-  html += '<div class="fg-legend" style="margin-top:20px">' +
-    '<span><span class="sw" style="background:var(--accent)"></span> Start</span>' +
-    '<span><span class="sw" style="background:var(--green)"></span> Success</span>' +
-    '<span><span class="sw" style="background:var(--orange)"></span> Decision</span>' +
-    '<span><span class="sw" style="background:var(--red)"></span> Warning</span>' +
-    '<span><span class="sw" style="background:var(--surface);border-color:var(--border)"></span> Step</span>' +
-    '<span style="margin-left:8px">💡 Click to mark complete</span>' +
-  '</div>';
-
-  grid.innerHTML = html;
-
-  // Global toggle function
-  window.flowClick = toggle;
+  render();
 })();
+</script>
 </script>
 
 </div>
