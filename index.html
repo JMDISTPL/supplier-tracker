@@ -291,7 +291,8 @@
     <a href="#suppliers" class="active" onclick="switchPage('suppliers')">📋 Suppliers</a>
     <a href="#calendar" onclick="switchPage('calendar')">📅 Calendar</a>
     <a href="#flow" onclick="switchPage('flow')">🗺️ Flow</a>
-  </nav>
+        <a href="#expenses" onclick="switchPage('expenses')">💰 Expenses</a>
+      </nav>
 </header>
 
 <div class="main-area">
@@ -468,6 +469,59 @@
 </script>
 
 </div>
+
+<!-- EXPENSES PAGE -->
+<div id="page-expenses" class="page" style="padding:0;overflow:hidden">
+  <div style="flex:1;overflow-y:auto;padding:24px 32px">
+    <div style="max-width:800px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:18px;font-weight:600">💰 Expenses</h2>
+          <p style="color:var(--text2);font-size:13px">Track your Amazon PL spending</p>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Total Spent</div>
+          <div style="font-size:28px;font-weight:700;color:var(--accent)" id="totalAmount">$0.00</div>
+        </div>
+      </div>
+
+      <!-- Entry form -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Date</div>
+          <input type="date" id="expDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:13px;outline:none;height:36px;box-sizing:border-box" />
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Amount ($)</div>
+          <input type="number" id="expAmount" step="0.01" min="0" placeholder="0.00" style="width:110px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:13px;outline:none;height:36px;box-sizing:border-box" />
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Category</div>
+          <select id="expCategory" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:13px;outline:none;height:36px;box-sizing:border-box">
+            <option value="Shipping">Shipping</option>
+            <option value="Samples">Samples</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Advertising">Advertising</option>
+            <option value="Tools/Software">Tools/Software</option>
+            <option value="Packaging">Packaging</option>
+            <option value="Legal">Legal</option>
+            <option value="Banking">Banking</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:150px">
+          <div style="font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Description</div>
+          <input type="text" id="expDesc" placeholder="What was this for?" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:13px;outline:none;height:36px;box-sizing:border-box" />
+        </div>
+        <button class="btn btn-primary" onclick="addExpense()" style="height:36px">+ Add</button>
+      </div>
+
+      <!-- Expense list -->
+      <div id="expenseList"><div class="loading"><div class="spinner"></div><div>Loading expenses...</div></div></div>
+    </div>
+  </div>
+</div>
+
 <!-- Supplier Modal -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
@@ -528,8 +582,8 @@ function switchPage(name) {
   window.location.hash = name;
   
     if (name === 'calendar') renderCalendar();
-    if (name === 'sourcing') { loadNiches(); }
-  }
+      if (name === 'expenses') loadExpenses();
+    }
 
 switchPage(window.location.hash ? window.location.hash.substring(1) : 'suppliers');
 
@@ -561,6 +615,51 @@ function openAddModal(){document.getElementById('modalTitle').textContent='+ Add
 function openEditModal(id){var s=suppliers.find(function(s){return s.id==id;});if(!s)return;document.getElementById('modalTitle').textContent='\u270f Edit Supplier';document.getElementById('editId').value=id;document.getElementById('fCompany').value=s.company;document.getElementById('fStorefront').value=s.storefront_link||'';document.getElementById('fStatus').value=s.status;document.getElementById('fEmail').value=s.email||'';document.getElementById('fNotes').value=s.notes||'';document.getElementById('fVerified').checked=s.verified_pro||false;document.getElementById('modal').classList.add('open');}
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 async function saveSupplier(){var co=document.getElementById('fCompany').value.trim();if(!co){toast('Company name required',true);return;}var eid=document.getElementById('editId').value;var p={company:co,storefront_link:document.getElementById('fStorefront').value.trim(),status:document.getElementById('fStatus').value,email:document.getElementById('fEmail').value.trim(),notes:document.getElementById('fNotes').value.trim(),verified_pro:document.getElementById('fVerified').checked,updated_at:new Date().toISOString()};try{if(eid){await api('PATCH','/rest/v1/suppliers?id=eq.'+eid,p);var idx=suppliers.findIndex(function(s){return s.id==eid;});if(idx>=0)suppliers[idx]=Object.assign({},suppliers[idx],p);toast('Updated '+co);}else{var d=await api('POST','/rest/v1/suppliers',p);if(d)suppliers.unshift(d[0]);toast('Added '+co);}closeModal();renderSuppliers();}catch(e){toast('Error: '+e.message,true);}}
+
+// ============================================================
+// EXPENSES
+// ============================================================
+var CAT_COLORS = { 'Shipping':'var(--blue)', 'Samples':'var(--orange)', 'Supplies':'var(--accent)', 'Advertising':'var(--red)', 'Packaging':'var(--green)', 'Legal':'var(--yellow)', 'Banking':'var(--text2)' };
+
+async function loadExpenses() {
+  try { var d = (await api('GET','/rest/v1/expenses?select=*&order=expense_date.desc'))||[]; renderExpenses(d); }
+  catch(e) { renderExpenses([]); }
+}
+
+function renderExpenses(data) {
+  var total = data.reduce(function(s,e){return s+parseFloat(e.amount);},0);
+  document.getElementById('totalAmount').textContent = '$'+total.toFixed(2);
+  if (!data.length) {
+    document.getElementById('expenseList').innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text2)"><div style="font-size:36px;margin-bottom:8px">📭</div><h3 style="font-size:16px;color:var(--text);margin-bottom:4px">No expenses yet</h3><p style="font-size:13px">Add your first expense above!</p></div>';
+    return;
+  }
+  var h='<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="border-bottom:1px solid var(--border)"><th style="padding:10px 14px;text-align:left;color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase">Date</th><th style="padding:10px 14px;text-align:left;color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase">Category</th><th style="padding:10px 14px;text-align:left;color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase">Description</th><th style="padding:10px 14px;text-align:right;color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase">Amount</th><th style="width:30px"></th></tr></thead><tbody>';
+  data.forEach(function(e) {
+    var c = CAT_COLORS[e.category]||'var(--text2)';
+    h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px;white-space:nowrap">'+e.expense_date+'</td><td style="padding:10px 14px"><span style="color:'+c+';font-weight:500">'+escHtml(e.category)+'</span></td><td style="padding:10px 14px;color:var(--text2)">'+escHtml(e.description||'')+'</td><td style="padding:10px 14px;text-align:right;font-weight:600;font-size:14px">$'+parseFloat(e.amount).toFixed(2)+'</td><td style="padding:10px 14px;text-align:center"><button class="btn-sm" onclick="deleteExpense('+e.id+')" style="color:var(--red);border:none;padding:2px 6px">✕</button></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  document.getElementById('expenseList').innerHTML = h;
+}
+
+async function addExpense() {
+  var date = document.getElementById('expDate').value;
+  var amount = parseFloat(document.getElementById('expAmount').value);
+  var cat = document.getElementById('expCategory').value;
+  var desc = document.getElementById('expDesc').value.trim();
+  if (!date) { toast('Date required',true); return; }
+  if (!amount||amount<=0) { toast('Enter valid amount',true); return; }
+  try {
+    var d = await api('POST','/rest/v1/expenses',{expense_date:date,amount:amount,category:cat,description:desc});
+    if (d) { document.getElementById('expAmount').value=''; document.getElementById('expDesc').value=''; toast('$'+amount.toFixed(2)+' added!'); loadExpenses(); }
+  } catch(e) { toast('Error: '+e.message,true); }
+}
+
+async function deleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  try { await api('DELETE','/rest/v1/expenses?id=eq.'+id); loadExpenses(); toast('Expense deleted'); }
+  catch(e) { toast('Error',true); }
+}
 
 // ============================================================
 // CALENDAR
